@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
-@Table(name = "user", schema = "quiz_app")
+@Table(name = "user", schema = "quiz_app",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_name", "email"}, name = "UQ_fields")})
 public class User extends IdField{
 
     @Column(name = "user_name", nullable = false, length = 50)
     private String userName;
-    @Column(name = "password", nullable = false, length = 20)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -20,6 +21,12 @@ public class User extends IdField{
     private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role",
+            joinColumns={@JoinColumn(name="id.user")},
+            inverseJoinColumns={@JoinColumn(name="id.role")},
+            foreignKey = @ForeignKey(name = "fk_user"),
+            inverseForeignKey = @ForeignKey(name = "fk_role"))
     private Collection<Role> roles = new ArrayList<>();
 
     public User(Long id, String userName, String password, String firstName, String lastName, String email, Collection<Role> roles) {
