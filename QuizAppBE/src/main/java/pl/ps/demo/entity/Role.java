@@ -8,8 +8,8 @@ import javax.persistence.*;
 @Table(name = "role", schema = "quiz_app")
 public class Role extends IdField{
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "role_name", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_name", nullable = false, length = 10)
     private RoleName roleName;
 
     public Role(Long id, RoleName roleName) {
@@ -20,8 +20,8 @@ public class Role extends IdField{
     public Role() {
     }
 
-    public RoleName getRoleName() {
-        return roleName;
+    public String getRoleName() {
+        return roleName.toString();
     }
 
     public void setRoleName(RoleName roleName) {
