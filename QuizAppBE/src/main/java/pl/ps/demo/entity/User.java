@@ -3,6 +3,7 @@ package pl.ps.demo.entity;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Table(name = "user", schema = "quiz_app",
@@ -19,6 +20,9 @@ public class User extends IdField{
     private String lastName;
     @Column(name = "email", nullable = false, length = 50)
     private String email;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Participant> participants;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
