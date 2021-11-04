@@ -1,4 +1,4 @@
-package pl.ps.demo.service;
+package pl.ps.demo.service.Implementation;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +11,7 @@ import pl.ps.demo.entity.Role;
 import pl.ps.demo.entity.User;
 import pl.ps.demo.repository.RoleRepository;
 import pl.ps.demo.repository.UserRepository;
+import pl.ps.demo.service.Interface.UserService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach( role -> {
-            authorities.add(new SimpleGrantedAuthority(role.getRoleName().toString()));
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
         });
         return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), authorities);
     }

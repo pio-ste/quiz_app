@@ -1,5 +1,8 @@
 package pl.ps.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,18 +10,22 @@ import javax.persistence.*;
 public class UserAnswer extends IdField{
 
     @Column(name = "is_correct", nullable = false, columnDefinition = "boolean default false")
+    @NotNull
     private Boolean isCorrect;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false, foreignKey = @ForeignKey(name = "fk_question"))
+    @JsonBackReference
     private Question question;
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_answer"))
+    @JsonBackReference
     private Answer answer;
 
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false, foreignKey = @ForeignKey(name = "fk_participant"))
+    @JsonBackReference
     private Participant participant;
 
     public UserAnswer(Long id, Boolean isCorrect, Question question, Answer answer, Participant participant) {
@@ -30,6 +37,14 @@ public class UserAnswer extends IdField{
     }
 
     public UserAnswer() {
+    }
+
+    public UserAnswer(UserAnswerBuilder userAnswerBuilder){
+        super(userAnswerBuilder);
+        this.isCorrect = userAnswerBuilder.isCorrect;
+        this.question = userAnswerBuilder.question;
+        this.answer = userAnswerBuilder.answer;
+        this.participant = userAnswerBuilder.participant;
     }
 
     public Boolean getCorrect() {
@@ -62,5 +77,45 @@ public class UserAnswer extends IdField{
 
     public void setParticipant(Participant participant) {
         this.participant = participant;
+    }
+
+    public static UserAnswerBuilder builder() {
+        return new UserAnswerBuilder();
+    }
+
+    public static final class UserAnswerBuilder extends IdField.Builder<UserAnswerBuilder>{
+        private Boolean isCorrect;
+        private Question question;
+        private Answer answer;
+        private Participant participant;
+
+        @Override
+        public UserAnswerBuilder getThis(){
+            return this;
+        }
+
+        public UserAnswerBuilder isCorrect(Boolean isCorrect){
+            this.isCorrect = isCorrect;
+            return this;
+        }
+
+        public UserAnswerBuilder question(Question question){
+            this.question = question;
+            return this;
+        }
+
+        public UserAnswerBuilder answer(Answer answer){
+            this.answer = answer;
+            return this;
+        }
+
+        public UserAnswerBuilder participant(Participant participant){
+            this.participant = participant;
+            return this;
+        }
+
+        public UserAnswer build(){
+            return new UserAnswer(this);
+        }
     }
 }

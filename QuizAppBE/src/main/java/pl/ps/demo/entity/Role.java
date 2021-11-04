@@ -1,5 +1,6 @@
 package pl.ps.demo.entity;
 
+import com.sun.istack.NotNull;
 import pl.ps.demo.ENUMS.RoleName;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ public class Role extends IdField{
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role_name", nullable = false, length = 10)
+    @NotNull
     private RoleName roleName;
 
     public Role(Long id, RoleName roleName) {

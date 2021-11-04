@@ -1,9 +1,10 @@
 package pl.ps.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sun.istack.NotNull;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -12,34 +13,63 @@ import java.util.Set;
 public class Quiz extends IdField{
 
     @Column(name = "title", nullable = false, length = 200)
+    @NotNull
     private String title;
 
     @Column(name = "description", nullable = false, length = 500)
+    @NotNull
     private String description;
 
+    @Column(name = "max_points", nullable = false, length = 5)
+    @NotNull
+    private Integer maxPoints;
+
     @Column(name = "start_date", nullable = false, columnDefinition = "TIMESTAMP")
+    @NotNull
     private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = false, columnDefinition = "TIMESTAMP")
+    @NotNull
     private LocalDateTime endDate;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
+    @JsonBackReference
+    private User user;
+
     @OneToMany(mappedBy = "quiz")
+    @JsonManagedReference
     private Set<Question> questions;
 
     @OneToMany(mappedBy = "quiz")
+    @JsonManagedReference
     private Set<Participant> participants;
 
-    public Quiz(Long id, String title, String description, LocalDateTime startDate, LocalDateTime endDate, Set<Question> questions, Set<Participant> participants) {
+    public Quiz(Long id, String title, String description, Integer maxPoints, LocalDateTime startDate, LocalDateTime endDate, User user, Set<Question> questions, Set<Participant> participants) {
         super(id);
         this.title = title;
         this.description = description;
+        this.maxPoints = maxPoints;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.user = user;
         this.questions = questions;
         this.participants = participants;
     }
 
     public Quiz() {
+    }
+
+    public Quiz(QuizBuilder quizBuilder){
+        super(quizBuilder);
+        this.title = quizBuilder.title;
+        this.description = quizBuilder.description;
+        this.maxPoints = quizBuilder.maxPoints;
+        this.startDate = quizBuilder.startDate;
+        this.endDate = quizBuilder.endDate;
+        this.user = quizBuilder.user;
+        this.questions = quizBuilder.questions;
+        this.participants = quizBuilder.participants;
     }
 
     public String getTitle() {
@@ -58,6 +88,14 @@ public class Quiz extends IdField{
         this.description = description;
     }
 
+    public Integer getMaxPoints() {
+        return maxPoints;
+    }
+
+    public void setMaxPoints(Integer maxPoints) {
+        this.maxPoints = maxPoints;
+    }
+
     public LocalDateTime getStartDate() {
         return startDate;
     }
@@ -74,6 +112,14 @@ public class Quiz extends IdField{
         this.endDate = endDate;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public Set<Question> getQuestions() {
         return questions;
     }
@@ -88,5 +134,69 @@ public class Quiz extends IdField{
 
     public void setParticipants(Set<Participant> participants) {
         this.participants = participants;
+    }
+
+    public static QuizBuilder builder(){
+        return new QuizBuilder();
+    }
+
+    public static final class QuizBuilder extends IdField.Builder<QuizBuilder>{
+        private String title;
+        private String description;
+        private Integer maxPoints;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private User user;
+        private Set<Question> questions;
+        private Set<Participant> participants;
+
+        @Override
+        public QuizBuilder getThis(){
+            return this;
+        }
+
+        public QuizBuilder title(String title){
+            this.title = title;
+            return this;
+        }
+
+        public QuizBuilder description(String description){
+            this.description = description;
+            return this;
+        }
+
+        public QuizBuilder maxPoints(Integer maxPoints){
+            this.maxPoints = maxPoints;
+            return this;
+        }
+
+        public QuizBuilder startDate(LocalDateTime startDate){
+            this.startDate = startDate;
+            return this;
+        }
+
+        public QuizBuilder endDate(LocalDateTime endDate){
+            this.endDate = endDate;
+            return this;
+        }
+
+        public QuizBuilder user(User user){
+            this.user = user;
+            return this;
+        }
+
+        public QuizBuilder questions(Set<Question> questions){
+            this.questions = questions;
+            return this;
+        }
+
+        public QuizBuilder participants(Set<Participant> participants){
+            this.participants = participants;
+            return this;
+        }
+
+        public Quiz build() {
+            return new Quiz(this);
+        }
     }
 }
