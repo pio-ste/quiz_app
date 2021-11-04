@@ -1,4 +1,4 @@
-package pl.ps.demo.service;
+package pl.ps.demo.service.Interface;
 
 
 import pl.ps.demo.ENUMS.RoleName;

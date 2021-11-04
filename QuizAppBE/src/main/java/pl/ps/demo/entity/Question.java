@@ -1,5 +1,9 @@
 package pl.ps.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -8,27 +12,38 @@ import java.util.Set;
 public class Question extends IdField{
 
     @Column(name = "content", nullable = false, length = 300)
+    @NotNull
     private String content;
 
+    @Column(name = "img")
+    @Lob
+    private byte[] img;
+
     @Column(name = "time", nullable = false, length = 3)
+    @NotNull
     private Integer time;
 
     @Column(name = "points", nullable = false, length = 2)
+    @NotNull
     private Integer points;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false, foreignKey = @ForeignKey(name = "fk_quiz"))
+    @JsonBackReference
     private Quiz quiz;
 
     @OneToMany(mappedBy = "question")
+    @JsonManagedReference
     private Set<UserAnswer> userAnswers;
 
     @OneToMany(mappedBy = "question")
+    @JsonManagedReference
     private Set<Answer> answers;
 
-    public Question(Long id, String content, Integer time, Integer points, Quiz quiz, Set<UserAnswer> userAnswers, Set<Answer> answers) {
+    public Question(Long id, String content, byte[] img, Integer time, Integer points, Quiz quiz, Set<UserAnswer> userAnswers, Set<Answer> answers) {
         super(id);
         this.content = content;
+        this.img = img;
         this.time = time;
         this.points = points;
         this.quiz = quiz;
@@ -39,12 +54,31 @@ public class Question extends IdField{
     public Question() {
     }
 
+    public Question(QuestionBuilder questionBuilder){
+        super(questionBuilder);
+        this.content = questionBuilder.content;
+        this.img = questionBuilder.img;
+        this.time = questionBuilder.time;
+        this.points = questionBuilder.points;
+        this.quiz = questionBuilder.quiz;
+        this.userAnswers = questionBuilder.userAnswers;
+        this.answers = questionBuilder.answers;
+    }
+
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public byte[] getImg() {
+        return img;
+    }
+
+    public void setImg(byte[] img) {
+        this.img = img;
     }
 
     public Integer getTime() {
@@ -85,5 +119,64 @@ public class Question extends IdField{
 
     public void setAnswers(Set<Answer> answers) {
         this.answers = answers;
+    }
+
+    public static QuestionBuilder builder(){
+        return new QuestionBuilder();
+    }
+
+    public static final class QuestionBuilder extends IdField.Builder<QuestionBuilder>{
+
+        private String content;
+        private byte[] img;
+        private Integer time;
+        private Integer points;
+        private Quiz quiz;
+        private Set<UserAnswer> userAnswers;
+        private Set<Answer> answers;
+
+        @Override
+        public QuestionBuilder getThis(){
+            return this;
+        }
+
+        public QuestionBuilder content(String content){
+            this.content = content;
+            return this;
+        }
+
+        public QuestionBuilder img(byte[] img){
+            this.img = img;
+            return this;
+        }
+
+        public QuestionBuilder time(Integer time) {
+            this.time = time;
+            return this;
+        }
+
+        public QuestionBuilder points(Integer points) {
+            this.points = points;
+            return this;
+        }
+
+        public QuestionBuilder quiz(Quiz quiz){
+            this.quiz = quiz;
+            return this;
+        }
+
+        public QuestionBuilder userAnswers(Set<UserAnswer> userAnswers){
+            this.userAnswers = userAnswers;
+            return this;
+        }
+
+        public QuestionBuilder answers(Set<Answer> answers){
+            this.answers = answers;
+            return this;
+        }
+
+        public Question build(){
+            return new Question(this);
+        }
     }
 }

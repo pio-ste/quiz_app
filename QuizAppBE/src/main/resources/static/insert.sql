@@ -22,3 +22,24 @@ VALUES (2, 2);
 INSERT INTO "user_role" (id_user, id_role)
 VALUES (3, 1);
 
+--quiz--
+INSERT INTO "quiz" (id, description, end_date, max_points, start_date, title, user_id)
+VALUES (1, 'przykładowy test', '2018-03-31 9:30:20', 20, '2017-03-31 9:30:20', 'test1', 2);
+
+--question--
+INSERT INTO "question" (id, "content", img, points, "time", quiz_id)
+VALUES (1, 'pytanie 1', null, 2, 30, 1);
+INSERT INTO "question" (id, "content", img, points, "time", quiz_id)
+VALUES (2, 'pytanie 2', null, 2, 30, 1);
+INSERT INTO "question" (id, "content", img, points, "time", quiz_id)
+VALUES (3, 'pytanie 3', null, 2, 30, 1);
+
+--answer--
+INSERT INTO "answer" (id, "content", is_correct, question_id)
+VALUES (1, 'odpowiedz 1', true, 1);
+INSERT INTO "answer" (id, "content", is_correct, question_id)
+VALUES (2, 'odpowiedz 2', false, 1);
+INSERT INTO "answer" (id, "content", is_correct, question_id)
+VALUES (3, 'odpowiedz 3', false, 1);
+INSERT INTO "answer" (id, "content", is_correct, question_id)
+VALUES (4, 'odpowiedz 4', false, 1);
