@@ -1,6 +1,7 @@
 package pl.ps.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 
@@ -19,13 +20,13 @@ public class Answer extends IdField{
     @NotNull
     private Boolean isCorrect;
 
-    @OneToMany(mappedBy = "answer")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "answer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<UserAnswer> userAnswers;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false, foreignKey = @ForeignKey(name = "fk_question"))
-    @JsonBackReference
+    @JsonIgnore
     private Question question;
 
     public Answer(Long id, String content, Boolean isCorrect, Set<UserAnswer> userAnswers, Question question) {

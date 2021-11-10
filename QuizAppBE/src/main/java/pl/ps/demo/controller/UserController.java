@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
-@RequestMapping("/quizApp")
+@RequestMapping("/quizApp/user")
 public class UserController {
 
     private final UserService userService;
@@ -35,15 +36,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/tutor/getUsers")
+    /*@GetMapping("/tutor/getUsers")
     public ResponseEntity<List<User>>getAllUsers(){
         return ResponseEntity.ok().body(userService.getUsers());
-    }
+    }*/
 
-    @PostMapping("/saveUser")
+    @PostMapping("/saveStudent")
     public ResponseEntity<User>saveUser(@RequestBody User user){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/saveUser").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+        try {
+            User newUser = userService.saveStudent(user);
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PostMapping("/saveRole")

@@ -1,6 +1,7 @@
 package pl.ps.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
@@ -15,17 +16,17 @@ public class UserAnswer extends IdField{
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false, foreignKey = @ForeignKey(name = "fk_question"))
-    @JsonBackReference
+    @JsonIgnore
     private Question question;
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_answer"))
-    @JsonBackReference
+    @JsonIgnore
     private Answer answer;
 
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false, foreignKey = @ForeignKey(name = "fk_participant"))
-    @JsonBackReference
+    @JsonIgnore
     private Participant participant;
 
     public UserAnswer(Long id, Boolean isCorrect, Question question, Answer answer, Participant participant) {

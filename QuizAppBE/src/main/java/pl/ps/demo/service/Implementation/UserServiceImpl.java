@@ -14,9 +14,7 @@ import pl.ps.demo.repository.UserRepository;
 import pl.ps.demo.service.Interface.UserService;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -34,16 +32,39 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
+    public User saveStudent(User user) {
+        Role role = roleRepository.findByRoleName(RoleName.STUDENT);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
+        return userRepository.save(user);
+    }
 
     @Override
-    public User saveUser(User user) {
+    public User saveTutor(User user) {
+        Role role = roleRepository.findByRoleName(RoleName.TUTOR);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
         return userRepository.save(user);
     }
 
     @Override
     public Role saveRole(Role role) {
         return roleRepository.save(role);
+    }
+
+    @Override
+    public User updateUser(User user) {
+        User newUser = userRepository.findUserById(user.getId());
+        newUser.setEmail(user.getEmail());
+        newUser.setFirstName(user.getFirstName());
+        newUser.setLastName(user.getLastName());
+        newUser.setUserName(user.getUserName());
+        return userRepository.save(newUser);
     }
 
     @Override
@@ -59,8 +80,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<User> getStudents() {
+        Role role = roleRepository.findByRoleName(RoleName.STUDENT);
+        return userRepository.findUserByRolesEquals(role);
     }
 
     @Override

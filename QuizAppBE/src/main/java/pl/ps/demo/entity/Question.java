@@ -1,6 +1,7 @@
 package pl.ps.demo.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 
@@ -17,7 +18,7 @@ public class Question extends IdField{
 
     @Column(name = "img")
     @Lob
-    private byte[] img;
+    private Byte[] img;
 
     @Column(name = "time", nullable = false, length = 3)
     @NotNull
@@ -29,18 +30,18 @@ public class Question extends IdField{
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false, foreignKey = @ForeignKey(name = "fk_quiz"))
-    @JsonBackReference
+    @JsonIgnore
     private Quiz quiz;
 
-    @OneToMany(mappedBy = "question")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<UserAnswer> userAnswers;
 
-    @OneToMany(mappedBy = "question")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Answer> answers;
 
-    public Question(Long id, String content, byte[] img, Integer time, Integer points, Quiz quiz, Set<UserAnswer> userAnswers, Set<Answer> answers) {
+    public Question(Long id, String content, Byte[] img, Integer time, Integer points, Quiz quiz, Set<UserAnswer> userAnswers, Set<Answer> answers) {
         super(id);
         this.content = content;
         this.img = img;
@@ -73,11 +74,11 @@ public class Question extends IdField{
         this.content = content;
     }
 
-    public byte[] getImg() {
+    public Byte[] getImg() {
         return img;
     }
 
-    public void setImg(byte[] img) {
+    public void setImg(Byte[] img) {
         this.img = img;
     }
 
@@ -128,7 +129,7 @@ public class Question extends IdField{
     public static final class QuestionBuilder extends IdField.Builder<QuestionBuilder>{
 
         private String content;
-        private byte[] img;
+        private Byte[] img;
         private Integer time;
         private Integer points;
         private Quiz quiz;
@@ -145,7 +146,7 @@ public class Question extends IdField{
             return this;
         }
 
-        public QuestionBuilder img(byte[] img){
+        public QuestionBuilder img(Byte[] img){
             this.img = img;
             return this;
         }

@@ -6,7 +6,7 @@ import pl.ps.demo.ENUMS.RoleName;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "role", schema = "quiz_app")
+@Table(name = "roles", schema = "quiz_app")
 public class Role extends IdField{
 
     @Enumerated(EnumType.STRING)

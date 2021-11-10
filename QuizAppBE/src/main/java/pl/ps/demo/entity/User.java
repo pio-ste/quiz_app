@@ -1,15 +1,13 @@
 package pl.ps.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
 
 @Entity
-@Table(name = "user", schema = "quiz_app",
+@Table(name = "users", schema = "quiz_app",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"user_name", "email"}, name = "UQ_fields")})
 public class User extends IdField{
 
@@ -33,24 +31,24 @@ public class User extends IdField{
     @NotNull
     private String email;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Quiz> quizzes;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Participant> participants;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "user_role",
-            joinColumns={@JoinColumn(name="id.user")},
-            inverseJoinColumns={@JoinColumn(name="id.role")},
-            foreignKey = @ForeignKey(name = "fk_user"),
-            inverseForeignKey = @ForeignKey(name = "fk_role"))
-    private Collection<Role> roles = new ArrayList<>();
+            name = "user_roles",
+            joinColumns={@JoinColumn(name="id.users")},
+            inverseJoinColumns={@JoinColumn(name="id.roles")},
+            foreignKey = @ForeignKey(name = "fk_users"),
+            inverseForeignKey = @ForeignKey(name = "fk_roles"))
+    private Set<Role> roles;
 
-    public User(Long id, String userName, String password, String firstName, String lastName, String email, Set<Quiz> quizzes, Set<Participant> participants, Collection<Role> roles) {
+    public User(Long id, String userName, String password, String firstName, String lastName, String email, Set<Quiz> quizzes, Set<Participant> participants, Set<Role> roles) {
         super(id);
         this.userName = userName;
         this.password = password;
@@ -133,11 +131,11 @@ public class User extends IdField{
         this.participants = participants;
     }
 
-    public Collection<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
@@ -153,7 +151,7 @@ public class User extends IdField{
         private String email;
         private Set<Quiz> quizzes;
         private Set<Participant> participants;
-        private Collection<Role> roles;
+        private Set<Role> roles;
 
         @Override
         public UserBuilder getThis() {
@@ -195,7 +193,7 @@ public class User extends IdField{
             return this;
         }
 
-        public UserBuilder roles(Collection<Role> roles){
+        public UserBuilder roles(Set<Role> roles){
             this.roles = roles;
             return this;
         }
