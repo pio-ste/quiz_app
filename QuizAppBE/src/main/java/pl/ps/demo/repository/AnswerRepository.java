@@ -12,7 +12,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     Answer findAnswerById(Long id);
 
-    List<Answer> findAnswerByIdAndIsCorrect(Long id, Boolean isCorrect);
+    List<Answer> findAnswerByQuestion_IdAndIsCorrect(Long id, Boolean isCorrect);
 
-    List<Answer> findAnswerByQuestion(Question question);
+    List<Answer> findAnswerByQuestion_Id(Long idQuestion);
 }

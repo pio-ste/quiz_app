@@ -9,13 +9,17 @@ import java.util.List;
 
 public interface UserService {
 
-    User saveUser(User user);
+    User saveStudent(User user);
+
+    User saveTutor(User user);
 
     Role saveRole(Role role);
+
+    User updateUser(User user);
 
     void addRoleToUser(String userName, RoleName roleName);
 
     User getUser(String userName);
 
-    List<User> getUsers();
+    List<User> getStudents();
 }

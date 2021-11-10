@@ -1,11 +1,11 @@
 package pl.ps.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
-import pl.ps.demo.ENUMS.RoleName;
 import pl.ps.demo.ENUMS.Status;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "participant", schema = "quiz_app")
@@ -22,20 +22,25 @@ public class Participant extends IdField{
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
-    @JsonBackReference
+    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false, foreignKey = @ForeignKey(name = "fk_quiz"))
-    @JsonBackReference
+    @JsonIgnore
     private Quiz quiz;
 
-    public Participant(Long id, Integer result, Status status, User user, Quiz quiz) {
+    @OneToMany(mappedBy = "participant", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<UserAnswer> userAnswers;
+
+    public Participant(Long id, Integer result, Status status, User user, Quiz quiz, Set<UserAnswer> userAnswers) {
         super(id);
         this.result = result;
         this.status = status;
         this.user = user;
         this.quiz = quiz;
+        this.userAnswers = userAnswers;
     }
 
     public Participant() {
@@ -47,6 +52,7 @@ public class Participant extends IdField{
         this.status = participantBuilder.status;
         this.user = participantBuilder.user;
         this.quiz = participantBuilder.quiz;
+        this.userAnswers = participantBuilder.userAnswers;
     }
 
     public Integer getResult() {
@@ -57,8 +63,8 @@ public class Participant extends IdField{
         this.result = result;
     }
 
-    public String getStatus() {
-        return status.toString();
+    public Status getStatus() {
+        return status;
     }
 
     public void setStatus(Status status) {
@@ -81,6 +87,14 @@ public class Participant extends IdField{
         this.quiz = quiz;
     }
 
+    public Set<UserAnswer> getUserAnswers() {
+        return userAnswers;
+    }
+
+    public void setUserAnswers(Set<UserAnswer> userAnswers) {
+        this.userAnswers = userAnswers;
+    }
+
     public static ParticipantBuilder builder(){
         return new ParticipantBuilder();
     }
@@ -90,6 +104,7 @@ public class Participant extends IdField{
         private Status status;
         private User user;
         private Quiz quiz;
+        private Set<UserAnswer> userAnswers;
 
         @Override
         public ParticipantBuilder getThis() {
@@ -113,6 +128,11 @@ public class Participant extends IdField{
 
         public ParticipantBuilder quiz(Quiz quiz){
             this.quiz = quiz;
+            return this;
+        }
+
+        public ParticipantBuilder userAnswers(Set<UserAnswer> userAnswers){
+            this.userAnswers = userAnswers;
             return this;
         }
 

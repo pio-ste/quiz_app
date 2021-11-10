@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface QuizService {
 
-    Quiz addQuiz(Long idUser, Quiz quiz);
+    Quiz saveQuiz(Long idUser, Quiz quiz);
 
-    void deleteQuiz(Integer id);
+    void deleteQuiz(Long id);
 
-    Quiz updateQuiz(Long id, Long idUser, Quiz quiz);
+    Quiz updateQuiz(Quiz quiz);
 
-    List<Quiz> getQuiz(Integer id);
+    Quiz getQuiz(Long id);
 
-    List<Quiz> getAllUserQuizzes(Integer id);
+    List<Quiz> getAllUserQuizzes(Long id);
 }

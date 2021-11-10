@@ -18,4 +18,6 @@ public interface ParticipantService {
     List<Participant> getParticipantGreaterThanResult(Integer result);
 
     List<Participant> getParticipantLessThanResult(Integer result);
+
+    List<Participant> getAllParticipant(Long id);
 }

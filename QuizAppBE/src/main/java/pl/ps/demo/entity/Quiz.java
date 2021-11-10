@@ -1,7 +1,6 @@
 package pl.ps.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
@@ -33,16 +32,16 @@ public class Quiz extends IdField{
     private LocalDateTime endDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
-    @JsonBackReference
+    @JoinColumn(name = "users_id", nullable = false, foreignKey = @ForeignKey(name = "fk_users"))
+    @JsonIgnore
     private User user;
 
-    @OneToMany(mappedBy = "quiz")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Question> questions;
 
-    @OneToMany(mappedBy = "quiz")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Participant> participants;
 
     public Quiz(Long id, String title, String description, Integer maxPoints, LocalDateTime startDate, LocalDateTime endDate, User user, Set<Question> questions, Set<Participant> participants) {

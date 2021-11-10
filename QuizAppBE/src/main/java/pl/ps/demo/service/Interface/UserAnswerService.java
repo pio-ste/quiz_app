@@ -8,5 +8,5 @@ public interface UserAnswerService {
 
     UserAnswer saveUserAnswer(Long idParticipant, Long idAnswer, Long idQuestion, UserAnswer userAnswer);
 
-    List<UserAnswer> getUserAnswers(Integer idQuestion);
+    List<UserAnswer> getUserAnswers(Long idQuestion);
 }
