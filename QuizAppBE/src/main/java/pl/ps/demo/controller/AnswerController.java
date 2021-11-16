@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.ps.demo.entity.Answer;
-import pl.ps.demo.entity.Question;
 import pl.ps.demo.entity.UserAnswer;
 import pl.ps.demo.service.Interface.AnswerService;
 import pl.ps.demo.service.Interface.UserAnswerService;
@@ -24,12 +23,33 @@ public class AnswerController {
         this.userAnswerService = userAnswerService;
     }
 
+    @GetMapping("/getCorrectAnswers/{idQuestion}/{isCorrect}")
+    public ResponseEntity<List<Answer>> getCorrectAnswers(@PathVariable("idQuestion") long idQuestion,
+                                                          @PathVariable("isCorrect") boolean isCorrect){
+        try{
+            List<Answer> answers = answerService.getAnswers(idQuestion, isCorrect);
+            return new ResponseEntity<>(answers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getQuestionAnswers/{idQuestion}")
+    public ResponseEntity<List<Answer>> getQuestionAnswers(@PathVariable("idQuestion") long idQuestion){
+        try{
+            List<Answer> answers = answerService.getAnswers(idQuestion);
+            return new ResponseEntity<>(answers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/saveAnswer/{idQuestion}")
     public ResponseEntity<List<Answer>> saveAnswer(@PathVariable("idQuestion") long idQuestion,
                                                  @RequestParam List<Answer> answers){
         try {
             List<Answer> newAnswers = answerService.saveAnswers(idQuestion, answers);
-            return new ResponseEntity<List<Answer>>(newAnswers, HttpStatus.CREATED);
+            return new ResponseEntity<>(newAnswers, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -63,6 +83,16 @@ public class AnswerController {
         try {
             UserAnswer newUserAnswer = userAnswerService.saveUserAnswer(idParticipant, idAnswer, idQuestion, userAnswer);
             return new ResponseEntity<>(newUserAnswer, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getUserAnswers/{idQuestion}")
+    public ResponseEntity<List<UserAnswer>> getCorrectAnswers(@PathVariable("idQuestion") long idQuestion){
+        try{
+            List<UserAnswer> userAnswers = userAnswerService.getUserAnswers(idQuestion);
+            return new ResponseEntity<>(userAnswers, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

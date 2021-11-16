@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.ps.demo.entity.Answer;
 import pl.ps.demo.entity.Question;
 import pl.ps.demo.entity.User;
 import pl.ps.demo.service.Interface.QuestionService;
@@ -63,6 +64,36 @@ public class QuestionController {
         try{
             List<Question> questions = questionService.getQuestionWithAnswersByIdQuiz(idQuiz);
             return new ResponseEntity<>(questions, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getQuestionsWithUserAns/{idQuiz}")
+    public ResponseEntity<List<Question>> getQuestionsWithUserAns(@PathVariable("idQuiz") long idQuiz){
+        try{
+            List<Question> questions = questionService.getQuestionWithUserAnswersIdQuiz(idQuiz);
+            return new ResponseEntity<>(questions, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/updateQuestion")
+    public ResponseEntity<Question> updateQuestion(@RequestBody Question question){
+        try {
+            Question newQuestion = questionService.updateQuestion(question);
+            return new ResponseEntity<>(newQuestion, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/deleteQuestion/{idQuestion}")
+    public ResponseEntity<HttpStatus> deleteQuestion(@PathVariable("idQuestion") long idQuestion) {
+        try {
+            questionService.deleteQuestion(idQuestion);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
