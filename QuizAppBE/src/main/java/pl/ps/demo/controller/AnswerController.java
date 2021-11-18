@@ -3,6 +3,7 @@ package pl.ps.demo.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.ps.demo.DTO.UserAnswerDTO;
 import pl.ps.demo.entity.Answer;
 import pl.ps.demo.entity.UserAnswer;
 import pl.ps.demo.service.Interface.AnswerService;
@@ -46,7 +47,7 @@ public class AnswerController {
 
     @PostMapping("/saveAnswer/{idQuestion}")
     public ResponseEntity<List<Answer>> saveAnswer(@PathVariable("idQuestion") long idQuestion,
-                                                 @RequestParam List<Answer> answers){
+                                                 @RequestBody List<Answer> answers){
         try {
             List<Answer> newAnswers = answerService.saveAnswers(idQuestion, answers);
             return new ResponseEntity<>(newAnswers, HttpStatus.CREATED);
@@ -75,13 +76,10 @@ public class AnswerController {
         }
     }
 
-    @PostMapping("/saveUserAnswer/{idParticipant}/{idAnswer}/{idQuestion}")
-    public ResponseEntity<UserAnswer> saveUserAnswer(@PathVariable("idParticipant") long idParticipant,
-                                                       @PathVariable("idAnswer") long idAnswer,
-                                                       @PathVariable("idQuestion") long idQuestion,
-                                                       @RequestBody UserAnswer userAnswer){
+    @PostMapping("/saveUserAnswer")
+    public ResponseEntity<UserAnswer> saveUserAnswer(@RequestBody UserAnswerDTO userAnswerDTO){
         try {
-            UserAnswer newUserAnswer = userAnswerService.saveUserAnswer(idParticipant, idAnswer, idQuestion, userAnswer);
+            UserAnswer newUserAnswer = userAnswerService.saveUserAnswer(userAnswerDTO);
             return new ResponseEntity<>(newUserAnswer, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

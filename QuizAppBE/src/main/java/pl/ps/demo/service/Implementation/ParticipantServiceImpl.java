@@ -1,6 +1,7 @@
 package pl.ps.demo.service.Implementation;
 
 import org.springframework.stereotype.Service;
+import pl.ps.demo.DTO.ParticipantDTO;
 import pl.ps.demo.ENUMS.Status;
 import pl.ps.demo.entity.Participant;
 import pl.ps.demo.entity.Quiz;
@@ -27,11 +28,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Participant saveParticipant(Long idUser, Long idQuiz, Participant participant) {
-        User user = userRepository.findUserById(idUser);
-        Quiz quiz = quizRepository.findQuizById(idQuiz);
-        participant.setUser(user);
-        participant.setQuiz(quiz);
+    public Participant saveParticipant(ParticipantDTO participantDTO) {
+        User user = userRepository.findUserById(participantDTO.getUserID());
+        Quiz quiz = quizRepository.findQuizById(participantDTO.getQuizID());
+        Participant participant = Participant.builder()
+                .result(participantDTO.getResult())
+                .status(participantDTO.getStatus())
+                .quiz(quiz)
+                .user(user)
+                .build();
         return participantRepository.save(participant);
     }
 
@@ -46,18 +51,18 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public List<Participant> getParticipantByStatus(Status status) {
-        return participantRepository.findParticipantByStatus(status);
+    public List<Participant> getParticipantByStatus(Status status, Long idQuiz) {
+        return participantRepository.findParticipantByStatusAndQuiz_Id(status, idQuiz);
     }
 
     @Override
-    public List<Participant> getParticipantGreaterThanResult(Integer result) {
-        return participantRepository.findParticipantByResultIsGreaterThanEqual(result);
+    public List<Participant> getParticipantGreaterThanResult(Integer result, Long idQuiz) {
+        return participantRepository.findParticipantByResultIsGreaterThanEqualAndQuiz_Id(result, idQuiz);
     }
 
     @Override
-    public List<Participant> getParticipantLessThanResult(Integer result) {
-        return participantRepository.findParticipantByResultIsLessThanEqual(result);
+    public List<Participant> getParticipantLessThanResult(Integer result, Long idQuiz) {
+        return participantRepository.findParticipantByResultIsLessThanEqualAndQuiz_Id(result, idQuiz);
     }
 
     @Override
