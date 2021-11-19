@@ -11,11 +11,11 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     Participant findParticipantById(Long id);
 
-    List<Participant> findParticipantByStatus(Status status);
+    List<Participant> findParticipantByStatusAndQuiz_Id(Status status, Long idQuiz);
 
-    List<Participant> findParticipantByResultIsGreaterThanEqual(Integer result);
+    List<Participant> findParticipantByResultIsGreaterThanEqualAndQuiz_Id(Integer result, Long idQuiz);
 
-    List<Participant> findParticipantByResultIsLessThanEqual(Integer result);
+    List<Participant> findParticipantByResultIsLessThanEqualAndQuiz_Id(Integer result, Long idQuiz);
 
     List<Participant> findParticipantByQuiz_Id(Long id);
 }

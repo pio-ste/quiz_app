@@ -21,7 +21,7 @@ public class Participant extends IdField{
     private Status status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
+    @JoinColumn(name = "users_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
     @JsonIgnore
     private User user;
 

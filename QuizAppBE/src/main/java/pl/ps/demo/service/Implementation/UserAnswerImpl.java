@@ -1,6 +1,7 @@
 package pl.ps.demo.service.Implementation;
 
 import org.springframework.stereotype.Service;
+import pl.ps.demo.DTO.UserAnswerDTO;
 import pl.ps.demo.entity.Answer;
 import pl.ps.demo.entity.Participant;
 import pl.ps.demo.entity.Question;
@@ -29,13 +30,17 @@ public class UserAnswerImpl implements UserAnswerService {
     }
 
     @Override
-    public UserAnswer saveUserAnswer(Long idParticipant, Long idAnswer, Long idQuestion, UserAnswer userAnswer) {
-        Participant participant = participantRepository.findParticipantById(idParticipant);
-        Answer answer = answerRepository.findAnswerById(idAnswer);
-        Question question = questionRepository.findQuestionById(idQuestion);
-        userAnswer.setParticipant(participant);
-        userAnswer.setAnswer(answer);
-        userAnswer.setQuestion(question);
+    public UserAnswer saveUserAnswer(UserAnswerDTO userAnswerDTO) {
+
+        Participant participant = participantRepository.findParticipantById(userAnswerDTO.getParticipantID());
+        Answer answer = answerRepository.findAnswerById(userAnswerDTO.getAnswerID());
+        Question question = questionRepository.findQuestionById(userAnswerDTO.getQuestionID());
+        UserAnswer userAnswer = UserAnswer.builder()
+                .isCorrect(userAnswerDTO.getCorrect())
+                .participant(participant)
+                .answer(answer)
+                .question(question)
+                .build();
         return userAnswerRepository.save(userAnswer);
     }
 

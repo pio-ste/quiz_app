@@ -15,7 +15,31 @@
     <description>Quiz app</description>
     <properties>
         <java.version>11</java.version>
+        <flyway-maven-plugin.url>jdbc:postgresql://localhost:5432/postgres?currentSchema=quiz_app</flyway-maven-plugin.url>
+        <flyway-maven-plugin.user>postgres</flyway-maven-plugin.user>
+        <flyway-maven-plugin.password>admin</flyway-maven-plugin.password>
+        <flyway-maven-plugin.version>${flyway.version}</flyway-maven-plugin.version>
     </properties>
+    <profiles>
+        <profile>
+            <id>flyway-prod</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <flyway.locations>filesystem:src/main/resources/flyway/prod</flyway.locations>
+            </properties>
+        </profile>
+        <profile>
+            <id>flyway-prod-with-dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <flyway.locations>filesystem:src/main/resources/flyway</flyway.locations>
+            </properties>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,7 +78,10 @@
             <artifactId>java-jwt</artifactId>
             <version>3.18.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -63,7 +90,20 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway-maven-plugin.version}</version>
+                <configuration>
+                    <url>${flyway-maven-plugin.url}</url>
+                    <driver>org.postgresql.Driver</driver>
+                    <user>${flyway-maven-plugin.user}</user>
+                    <password>${flyway-maven-plugin.password}</password>
+                    <locations>
+                        <location>${flyway.locations}</location>
+                    </locations>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>

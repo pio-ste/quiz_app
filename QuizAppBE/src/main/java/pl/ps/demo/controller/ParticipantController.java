@@ -3,8 +3,8 @@ package pl.ps.demo.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.ps.demo.DTO.ParticipantDTO;
 import pl.ps.demo.ENUMS.Status;
-import pl.ps.demo.entity.Answer;
 import pl.ps.demo.entity.Participant;
 import pl.ps.demo.service.Interface.ParticipantService;
 
@@ -30,42 +30,44 @@ public class ParticipantController {
         }
     }
 
-    @GetMapping("/getParticipantGreaterThan/{status}")
-    public ResponseEntity<List<Participant>> getParticipantsByStatus(@PathVariable("status") Status status){
+    @GetMapping("/getParticipantByStatus/{status}/{idQuiz}")
+    public ResponseEntity<List<Participant>> getParticipantsByStatus(@PathVariable("status") Status status,
+                                                                     @PathVariable("idQuiz") Long idQuiz){
         try{
-            List<Participant> participants = participantService.getParticipantByStatus(status);
+            List<Participant> participants = participantService.getParticipantByStatus(status, idQuiz);
             return new ResponseEntity<>(participants, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/getParticipantGreaterThan/{result}")
-    public ResponseEntity<List<Participant>> getParticipantGreaterThan(@PathVariable("result") Integer result){
+    @GetMapping("/getParticipantGreaterThan/{result}/{idQuiz}")
+    public ResponseEntity<List<Participant>> getParticipantGreaterThan(@PathVariable("result") Integer result,
+                                                                       @PathVariable("idQuiz") Long idQuiz){
         try{
-            List<Participant> participants = participantService.getParticipantGreaterThanResult(result);
+            List<Participant> participants = participantService.getParticipantGreaterThanResult(result, idQuiz);
             return new ResponseEntity<>(participants, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/getParticipantLessThan/{result}")
-    public ResponseEntity<List<Participant>> getParticipantLessThan(@PathVariable("result") Integer result){
+    @GetMapping("/getParticipantLessThan/{result}/{idQuiz}")
+    public ResponseEntity<List<Participant>> getParticipantLessThan(@PathVariable("result") Integer result,
+                                                                    @PathVariable("idQuiz") Long idQuiz){
         try{
-            List<Participant> participants = participantService.getParticipantLessThanResult(result);
+            List<Participant> participants = participantService.getParticipantLessThanResult(result, idQuiz);
             return new ResponseEntity<>(participants, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/saveParticipant/{idUser}/{idQuiz}")
-    public ResponseEntity<Participant> saveParticipant(@PathVariable("idUser") long idUser,
-                                                   @PathVariable("idQuiz") long idQuiz,
-                                                   @RequestBody Participant participant){
+    @PostMapping("/saveParticipant")
+    public ResponseEntity<Participant> saveParticipant(@RequestBody ParticipantDTO participantDTO){
         try {
-            Participant newParticipant = participantService.saveParticipant(idUser, idQuiz, participant);
+            System.out.println(participantDTO.getStatus().toString());
+            Participant newParticipant = participantService.saveParticipant(participantDTO);
             return new ResponseEntity<>(newParticipant, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
