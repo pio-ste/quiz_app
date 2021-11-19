@@ -1,4 +1,4 @@
--- quiz_app.roles definition
+-- roles definition
 
 -- Drop table
 
@@ -12,11 +12,11 @@ CREATE TABLE roles (
 
 -- Permissions
 
-ALTER TABLE quiz_app.roles OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.roles TO postgres;
+ALTER TABLE roles OWNER TO postgres;
+GRANT ALL ON TABLE roles TO postgres;
 
 
--- quiz_app.users definition
+-- users definition
 
 -- Drop table
 
@@ -35,11 +35,11 @@ CREATE TABLE users (
 
 -- Permissions
 
-ALTER TABLE quiz_app.users OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.users TO postgres;
+ALTER TABLE users OWNER TO postgres;
+GRANT ALL ON TABLE users TO postgres;
 
 
--- quiz_app.quiz definition
+-- quiz definition
 
 -- Drop table
 
@@ -54,16 +54,16 @@ CREATE TABLE quiz (
                       title varchar(200) NOT NULL,
                       users_id int8 NOT NULL,
                       CONSTRAINT quiz_pkey PRIMARY KEY (id),
-                      CONSTRAINT fk_users FOREIGN KEY (users_id) REFERENCES quiz_app.users(id)
+                      CONSTRAINT fk_users FOREIGN KEY (users_id) REFERENCES users(id)
 );
 
 -- Permissions
 
-ALTER TABLE quiz_app.quiz OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.quiz TO postgres;
+ALTER TABLE quiz OWNER TO postgres;
+GRANT ALL ON TABLE quiz TO postgres;
 
 
--- quiz_app.user_roles definition
+-- user_roles definition
 
 -- Drop table
 
@@ -73,17 +73,17 @@ CREATE TABLE user_roles (
                             id_users int8 NOT NULL,
                             id_roles int8 NOT NULL,
                             CONSTRAINT user_roles_pkey PRIMARY KEY (id_users, id_roles),
-                            CONSTRAINT fk_roles FOREIGN KEY (id_roles) REFERENCES quiz_app.roles(id),
-                            CONSTRAINT fk_users FOREIGN KEY (id_users) REFERENCES quiz_app.users(id)
+                            CONSTRAINT fk_roles FOREIGN KEY (id_roles) REFERENCES roles(id),
+                            CONSTRAINT fk_users FOREIGN KEY (id_users) REFERENCES users(id)
 );
 
 -- Permissions
 
-ALTER TABLE quiz_app.user_roles OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.user_roles TO postgres;
+ALTER TABLE user_roles OWNER TO postgres;
+GRANT ALL ON TABLE user_roles TO postgres;
 
 
--- quiz_app.participant definition
+-- participant definition
 
 -- Drop table
 
@@ -96,17 +96,17 @@ CREATE TABLE participant (
                              quiz_id int8 NOT NULL,
                              user_id int8 NOT NULL,
                              CONSTRAINT participant_pkey PRIMARY KEY (id),
-                             CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz_app.quiz(id),
-                             CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES quiz_app.users(id)
+                             CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id),
+                             CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Permissions
 
-ALTER TABLE quiz_app.participant OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.participant TO postgres;
+ALTER TABLE participant OWNER TO postgres;
+GRANT ALL ON TABLE participant TO postgres;
 
 
--- quiz_app.question definition
+-- question definition
 
 -- Drop table
 
@@ -120,16 +120,16 @@ CREATE TABLE question (
                           "time" int4 NOT NULL,
                           quiz_id int8 NOT NULL,
                           CONSTRAINT question_pkey PRIMARY KEY (id),
-                          CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz_app.quiz(id)
+                          CONSTRAINT fk_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id)
 );
 
 -- Permissions
 
-ALTER TABLE quiz_app.question OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.question TO postgres;
+ALTER TABLE question OWNER TO postgres;
+GRANT ALL ON TABLE question TO postgres;
 
 
--- quiz_app.answer definition
+-- answer definition
 
 -- Drop table
 
@@ -141,16 +141,16 @@ CREATE TABLE answer (
                         is_correct bool NOT NULL DEFAULT false,
                         question_id int8 NOT NULL,
                         CONSTRAINT answer_pkey PRIMARY KEY (id),
-                        CONSTRAINT fk_question FOREIGN KEY (question_id) REFERENCES quiz_app.question(id)
+                        CONSTRAINT fk_question FOREIGN KEY (question_id) REFERENCES question(id)
 );
 
 -- Permissions
 
-ALTER TABLE quiz_app.answer OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.answer TO postgres;
+ALTER TABLE answer OWNER TO postgres;
+GRANT ALL ON TABLE answer TO postgres;
 
 
--- quiz_app.user_answer definition
+-- user_answer definition
 
 -- Drop table
 
@@ -163,12 +163,12 @@ CREATE TABLE user_answer (
                              participant_id int8 NOT NULL,
                              question_id int8 NOT NULL,
                              CONSTRAINT user_answer_pkey PRIMARY KEY (id),
-                             CONSTRAINT fk_answer FOREIGN KEY (answer_id) REFERENCES quiz_app.answer(id),
-                             CONSTRAINT fk_participant FOREIGN KEY (participant_id) REFERENCES quiz_app.participant(id),
-                             CONSTRAINT fk_question FOREIGN KEY (question_id) REFERENCES quiz_app.question(id)
+                             CONSTRAINT fk_answer FOREIGN KEY (answer_id) REFERENCES answer(id),
+                             CONSTRAINT fk_participant FOREIGN KEY (participant_id) REFERENCES participant(id),
+                             CONSTRAINT fk_question FOREIGN KEY (question_id) REFERENCES question(id)
 );
 
 -- Permissions
 
-ALTER TABLE quiz_app.user_answer OWNER TO postgres;
-GRANT ALL ON TABLE quiz_app.user_answer TO postgres;
+ALTER TABLE user_answer OWNER TO postgres;
+GRANT ALL ON TABLE user_answer TO postgres;
