@@ -10,19 +10,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import pl.ps.demo.DTO.UserDTO;
-import pl.ps.demo.entity.Role;
-import pl.ps.demo.entity.User;
-import pl.ps.demo.service.Interface.UserService;
+import pl.ps.demo.service.dto.UserDTO;
+import pl.ps.demo.model.entity.Role;
+import pl.ps.demo.model.entity.User;
+import pl.ps.demo.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -42,7 +43,9 @@ public class UserController {
     }*/
 
     @PostMapping("/saveStudent")
-    public ResponseEntity<User>saveUser(@RequestBody User user){
+    public ResponseEntity<User> saveUser(@RequestBody User user) {
+        //TODO wyrzuc ta linijke
+        userService.getUser(";[;fw");
         try {
             User newUser = userService.saveStudent(user);
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
@@ -53,13 +56,13 @@ public class UserController {
     }
 
     @PostMapping("/saveRole")
-    public ResponseEntity<Role>saveUser(@RequestBody Role role){
+    public ResponseEntity<Role> saveUser(@RequestBody Role role) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/saveRole").toUriString());
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
     @PostMapping("/addRoleToUser")
-    public ResponseEntity<?>addRoleToUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<?> addRoleToUser(@RequestBody UserDTO userDTO) {
         userService.addRoleToUser(userDTO.getUserName(), userDTO.getRoleName());
         return ResponseEntity.ok().build();
     }
@@ -67,7 +70,7 @@ public class UserController {
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refresh_token = authorizationHeader.substring("Bearer ".length());
                 Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
@@ -77,24 +80,25 @@ public class UserController {
                 User user = userService.getUser(userName);
                 String access_token = JWT.create()
                         .withSubject(user.getUserName())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 10*60*1000))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList()))
                         .sign(algorithm);
-                Map<String,String> tokens = new HashMap<>();
+                Map<String, String> tokens = new HashMap<>();
                 tokens.put("access_token", access_token);
                 tokens.put("refresh_token", refresh_token);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            } catch (Exception exception){
+            } catch (Exception exception) {
                 response.setHeader("error ", exception.getMessage());
                 response.setStatus(FORBIDDEN.value());
-                Map<String,String> tokens = new HashMap<>();
+                Map<String, String> tokens = new HashMap<>();
                 tokens.put("error_message", exception.getMessage());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
             }
         } else {
+            //TODO dodać własny wyjątek który będzie dziedziczył po RunTimeEx.
             throw new RuntimeException("Refresh token is missing");
         }
     }

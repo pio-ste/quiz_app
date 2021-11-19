@@ -3,10 +3,8 @@ package pl.ps.demo.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.ps.demo.entity.Participant;
-import pl.ps.demo.entity.Question;
-import pl.ps.demo.entity.Quiz;
-import pl.ps.demo.service.Interface.QuizService;
+import pl.ps.demo.model.entity.Quiz;
+import pl.ps.demo.service.QuizService;
 
 import java.util.List;
 
@@ -21,8 +19,8 @@ public class QuizController {
     }
 
     @GetMapping("/getUserQuiz/{idUser}")
-    public ResponseEntity<List<Quiz>> getUserQuiz(@PathVariable("idUser") long idUser){
-        try{
+    public ResponseEntity<List<Quiz>> getUserQuiz(@PathVariable("idUser") long idUser) {
+        try {
             List<Quiz> quizzes = quizService.getAllUserQuizzes(idUser);
             return new ResponseEntity<>(quizzes, HttpStatus.OK);
         } catch (Exception e) {
@@ -31,8 +29,8 @@ public class QuizController {
     }
 
     @GetMapping("/getQuiz/{idQuiz}")
-    public ResponseEntity<Quiz> getQuiz(@PathVariable("idQuiz") long idQuiz){
-        try{
+    public ResponseEntity<Quiz> getQuiz(@PathVariable("idQuiz") long idQuiz) {
+        try {
             Quiz quiz = quizService.getQuiz(idQuiz);
             return new ResponseEntity<>(quiz, HttpStatus.OK);
         } catch (Exception e) {
@@ -42,7 +40,7 @@ public class QuizController {
 
     @PostMapping("/saveQuiz/{idUser}")
     public ResponseEntity<Quiz> saveQuiz(@PathVariable("idUser") long idUser,
-                                         @RequestBody Quiz quiz){
+                                         @RequestBody Quiz quiz) {
         try {
             Quiz newQuiz = quizService.saveQuiz(idUser, quiz);
             return new ResponseEntity<>(newQuiz, HttpStatus.CREATED);
@@ -52,7 +50,7 @@ public class QuizController {
     }
 
     @PutMapping("/updateQuiz")
-    public ResponseEntity<Quiz> updateQuiz(@RequestBody Quiz Quiz){
+    public ResponseEntity<Quiz> updateQuiz(@RequestBody Quiz Quiz) {
         try {
             Quiz newQuiz = quizService.updateQuiz(Quiz);
             return new ResponseEntity<>(newQuiz, HttpStatus.CREATED);
