@@ -1,0 +1,4 @@
+GET localhost:8080/quizApp/getCorrectAnswers/2/false
+Accept: application/json
+
+###

@@ -1,15 +1,16 @@
 package pl.ps.demo.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.ps.demo.DTO.UserAnswerDTO;
-import pl.ps.demo.entity.Answer;
-import pl.ps.demo.entity.UserAnswer;
-import pl.ps.demo.service.Interface.AnswerService;
-import pl.ps.demo.service.Interface.UserAnswerService;
+import pl.ps.demo.model.entity.Answer;
+import pl.ps.demo.model.entity.UserAnswer;
+import pl.ps.demo.service.AnswerService;
+import pl.ps.demo.service.UserAnswerService;
+import pl.ps.demo.service.dto.UserAnswerDTO;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/quizApp")
@@ -25,74 +26,60 @@ public class AnswerController {
     }
 
     @GetMapping("/getCorrectAnswers/{idQuestion}/{isCorrect}")
-    public ResponseEntity<List<Answer>> getCorrectAnswers(@PathVariable("idQuestion") long idQuestion,
-                                                          @PathVariable("isCorrect") boolean isCorrect){
-        try{
-            List<Answer> answers = answerService.getAnswers(idQuestion, isCorrect);
-            return new ResponseEntity<>(answers, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public List<Answer> getCorrectAnswers(@PathVariable long idQuestion, @PathVariable boolean isCorrect) {
+        //throw new MyCustomException("my custom piotroroor");
+        return answerService.getAnswers(idQuestion, isCorrect);
+
     }
 
+    //TODO poprawić parametry w @PathVariable (usunąć)
+    //TODO usunąć ResponseEntity - przenieść obsługę do exception handlera
     @GetMapping("/getQuestionAnswers/{idQuestion}")
-    public ResponseEntity<List<Answer>> getQuestionAnswers(@PathVariable("idQuestion") long idQuestion){
-        try{
-            List<Answer> answers = answerService.getAnswers(idQuestion);
-            return new ResponseEntity<>(answers, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public List<Answer> getQuestionAnswers(@PathVariable("idQuestion") long idQuestion) {
+        return answerService.getAnswers(idQuestion);
     }
 
+    //TODO youtube ---> Encja na twarz i pcharz / phasz
+    @ResponseStatus(CREATED)
     @PostMapping("/saveAnswer/{idQuestion}")
-    public ResponseEntity<List<Answer>> saveAnswer(@PathVariable("idQuestion") long idQuestion,
-                                                 @RequestBody List<Answer> answers){
-        try {
-            List<Answer> newAnswers = answerService.saveAnswers(idQuestion, answers);
-            return new ResponseEntity<>(newAnswers, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public List<Answer> saveAnswer(@PathVariable long idQuestion, @RequestBody List<Answer> answers) {
+        return answerService.saveAnswers(idQuestion, answers);
     }
 
     @PutMapping("/updateAnswer")
-    public ResponseEntity<Answer> updateAnswer(@RequestBody Answer answer){
+    @ResponseStatus(CREATED)
+    public ResponseEntity<Answer> updateAnswer(@RequestBody Answer answer) {
         try {
             Answer newAnswer = answerService.updateAnswer(answer);
-            return new ResponseEntity<>(newAnswer, HttpStatus.CREATED);
+            return new ResponseEntity<>(newAnswer, CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
         }
     }
 
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/deleteAnswer/{idAnswer}")
-    public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("idAnswer") long idAnswer) {
-        try {
-            answerService.deleteAnswer(idAnswer);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public void deleteTutorial(@PathVariable long idAnswer) {
+        answerService.deleteAnswer(idAnswer);
     }
 
     @PostMapping("/saveUserAnswer")
-    public ResponseEntity<UserAnswer> saveUserAnswer(@RequestBody UserAnswerDTO userAnswerDTO){
+    public ResponseEntity<UserAnswer> saveUserAnswer(@RequestBody UserAnswerDTO userAnswerDTO) {
         try {
             UserAnswer newUserAnswer = userAnswerService.saveUserAnswer(userAnswerDTO);
-            return new ResponseEntity<>(newUserAnswer, HttpStatus.CREATED);
+            return new ResponseEntity<>(newUserAnswer, CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/getUserAnswers/{idQuestion}")
-    public ResponseEntity<List<UserAnswer>> getCorrectAnswers(@PathVariable("idQuestion") long idQuestion){
-        try{
+    public ResponseEntity<List<UserAnswer>> getCorrectAnswers(@PathVariable("idQuestion") long idQuestion) {
+        try {
             List<UserAnswer> userAnswers = userAnswerService.getUserAnswers(idQuestion);
-            return new ResponseEntity<>(userAnswers, HttpStatus.OK);
+            return new ResponseEntity<>(userAnswers, OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
         }
     }
 }

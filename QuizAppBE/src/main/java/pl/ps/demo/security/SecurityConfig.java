@@ -12,10 +12,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.bind.annotation.GetMapping;
-import pl.ps.demo.ENUMS.RoleName;
-import pl.ps.demo.filter.CustomAuthenticationFilter;
-import pl.ps.demo.filter.CustomAuthorizationFilter;
+import pl.ps.demo.model.enums.RoleName;
+import pl.ps.demo.security.filter.CustomAuthenticationFilter;
+import pl.ps.demo.security.filter.CustomAuthorizationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -41,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthenticationFilter.setFilterProcessesUrl("/quizApp/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/quizApp/user/**","/quizApp/login", "/quizApp/signUP", "/quizApp/home", "/quizApp/token/refresh/**").permitAll();
+        http.authorizeRequests().antMatchers("/quizApp/user/**", "/quizApp/login", "/quizApp/signUP", "/quizApp/home", "/quizApp/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers("/quizApp/student/**").hasAnyAuthority(RoleName.STUDENT.toString());
         http.authorizeRequests().antMatchers("/quizApp/tutor/**").hasAnyAuthority(RoleName.TUTOR.toString());
         http.authorizeRequests().anyRequest().permitAll();
