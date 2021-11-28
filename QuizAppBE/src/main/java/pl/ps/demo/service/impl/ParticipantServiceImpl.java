@@ -10,7 +10,11 @@ import pl.ps.demo.model.repository.ParticipantRepository;
 import pl.ps.demo.model.repository.QuizRepository;
 import pl.ps.demo.model.repository.UserRepository;
 import pl.ps.demo.service.ParticipantService;
+import pl.ps.demo.service.mapper.ParticipantMapper;
+import pl.ps.demo.service.validation.ParticipantValidation;
+import pl.ps.demo.service.validation.QuizValidation;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -28,45 +32,64 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Participant saveParticipant(ParticipantDTO participantDTO) {
-        User user = userRepository.findUserById(participantDTO.getUserID());
-        Quiz quiz = quizRepository.findQuizById(participantDTO.getQuizID());
+    public ParticipantDTO saveParticipant(Long idUser, Long idQuiz, ParticipantDTO participantDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var participantValidation = new ParticipantValidation(exceptionList, participantDTO);
+        participantValidation.validate();
+        User user = userRepository.getByIdOrThrow(idUser);
+        Quiz quiz = quizRepository.getByIdOrThrow(idQuiz);
         Participant participant = Participant.builder()
                 .result(participantDTO.getResult())
                 .status(participantDTO.getStatus())
                 .quiz(quiz)
                 .user(user)
                 .build();
-        return participantRepository.save(participant);
+        return ParticipantMapper.mapFromEntityToDto(participantRepository.save(participant));
     }
 
     @Override
     public void deleteParticipant(Long id) {
-        participantRepository.deleteById(id);
+        participantRepository.deleteOrThrow(id);
     }
 
     @Override
-    public Participant getParticipant(Long id) {
-        return participantRepository.findParticipantById(id);
+    public ParticipantDTO getParticipant(Long id) {
+        return ParticipantMapper.mapFromEntityToDto(participantRepository.getByIdOrThrow(id));
     }
 
     @Override
-    public List<Participant> getParticipantByStatus(Status status, Long idQuiz) {
-        return participantRepository.findParticipantByStatusAndQuiz_Id(status, idQuiz);
+    public List<ParticipantDTO> getParticipantByStatus(Status status, Long idQuiz) {
+        quizRepository.getByIdOrThrow(idQuiz);
+        List<ParticipantDTO> participantDTOS = new LinkedList<>();
+        participantRepository.findParticipantByStatusAndQuiz_Id(status, idQuiz).forEach(participant ->
+                participantDTOS.add(ParticipantMapper.mapFromEntityToDto(participant)));
+        return participantDTOS;
     }
 
     @Override
-    public List<Participant> getParticipantGreaterThanResult(Integer result, Long idQuiz) {
-        return participantRepository.findParticipantByResultIsGreaterThanEqualAndQuiz_Id(result, idQuiz);
+    public List<ParticipantDTO> getParticipantGreaterThanResult(Integer result, Long idQuiz) {
+        quizRepository.getByIdOrThrow(idQuiz);
+        List<ParticipantDTO> participantDTOS = new LinkedList<>();
+        participantRepository.findParticipantByResultIsGreaterThanEqualAndQuiz_Id(result, idQuiz).forEach(participant ->
+                participantDTOS.add(ParticipantMapper.mapFromEntityToDto(participant)));
+        return participantDTOS;
     }
 
     @Override
-    public List<Participant> getParticipantLessThanResult(Integer result, Long idQuiz) {
-        return participantRepository.findParticipantByResultIsLessThanEqualAndQuiz_Id(result, idQuiz);
+    public List<ParticipantDTO> getParticipantLessThanResult(Integer result, Long idQuiz) {
+        quizRepository.getByIdOrThrow(idQuiz);
+        List<ParticipantDTO> participantDTOS = new LinkedList<>();
+        participantRepository.findParticipantByResultIsLessThanEqualAndQuiz_Id(result, idQuiz).forEach(participant ->
+                participantDTOS.add(ParticipantMapper.mapFromEntityToDto(participant)));
+        return participantDTOS;
     }
 
     @Override
-    public List<Participant> getAllParticipant(Long id) {
-        return participantRepository.findParticipantByQuiz_Id(id);
+    public List<ParticipantDTO> getAllParticipant(Long idQuiz) {
+        quizRepository.getByIdOrThrow(idQuiz);
+        List<ParticipantDTO> participantDTOS = new LinkedList<>();
+        participantRepository.findParticipantByQuiz_Id(idQuiz).forEach(participant ->
+                participantDTOS.add(ParticipantMapper.mapFromEntityToDto(participant)));
+        return participantDTOS;
     }
 }

@@ -1,18 +1,18 @@
 package pl.ps.demo.service;
 
-import pl.ps.demo.model.entity.Quiz;
+import pl.ps.demo.service.dto.QuizDTO;
 
 import java.util.List;
 
 public interface QuizService {
 
-    Quiz saveQuiz(Long idUser, Quiz quiz);
+    QuizDTO saveQuiz(Long idUser, QuizDTO quizDTO);
 
-    void deleteQuiz(Long id);
+    void deleteQuiz(Long idQuiz);
 
-    Quiz updateQuiz(Quiz quiz);
+    QuizDTO updateQuiz(QuizDTO quizDTO);
 
-    Quiz getQuiz(Long id);
+    QuizDTO getQuiz(Long idQuiz);
 
-    List<Quiz> getAllUserQuizzes(Long id);
+    List<QuizDTO> getAllUserQuizzes(Long idUser);
 }

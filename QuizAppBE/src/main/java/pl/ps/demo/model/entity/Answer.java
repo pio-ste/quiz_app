@@ -1,30 +1,21 @@
 package pl.ps.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
-
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "answer", schema = "quiz_app")
+@Table(name = "answer")
 public class Answer extends IdField {
 
-    @Column(name = "content", nullable = false, length = 200)
-    @NotNull
     private String content;
 
-    @Column(name = "is_correct", nullable = false, columnDefinition = "boolean default false")
-    @NotNull
     private Boolean isCorrect;
 
     @OneToMany(mappedBy = "answer", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<UserAnswer> userAnswers;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false, foreignKey = @ForeignKey(name = "fk_question"))
-    @JsonIgnore
     private Question question;
 
     public Answer(Long id, String content, Boolean isCorrect, Set<UserAnswer> userAnswers, Question question) {

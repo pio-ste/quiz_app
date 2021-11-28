@@ -1,16 +1,15 @@
 package pl.ps.demo.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.ps.demo.model.entity.Answer;
-import pl.ps.demo.model.entity.UserAnswer;
 import pl.ps.demo.service.AnswerService;
 import pl.ps.demo.service.UserAnswerService;
+import pl.ps.demo.service.dto.AnswerDTO;
 import pl.ps.demo.service.dto.UserAnswerDTO;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/quizApp")
@@ -26,35 +25,27 @@ public class AnswerController {
     }
 
     @GetMapping("/getCorrectAnswers/{idQuestion}/{isCorrect}")
-    public List<Answer> getCorrectAnswers(@PathVariable long idQuestion, @PathVariable boolean isCorrect) {
-        //throw new MyCustomException("my custom piotroroor");
+    public List<AnswerDTO> getCorrectAnswers(@PathVariable long idQuestion, @PathVariable boolean isCorrect) {
         return answerService.getAnswers(idQuestion, isCorrect);
 
     }
 
-    //TODO poprawić parametry w @PathVariable (usunąć)
-    //TODO usunąć ResponseEntity - przenieść obsługę do exception handlera
     @GetMapping("/getQuestionAnswers/{idQuestion}")
-    public List<Answer> getQuestionAnswers(@PathVariable("idQuestion") long idQuestion) {
+    public List<AnswerDTO> getQuestionAnswers(@PathVariable long idQuestion) {
         return answerService.getAnswers(idQuestion);
     }
 
-    //TODO youtube ---> Encja na twarz i pcharz / phasz
+    //TODO youtube ---> Encja na twarz i pchasz
     @ResponseStatus(CREATED)
     @PostMapping("/saveAnswer/{idQuestion}")
-    public List<Answer> saveAnswer(@PathVariable long idQuestion, @RequestBody List<Answer> answers) {
+    public List<AnswerDTO> saveAnswer(@PathVariable long idQuestion, @RequestBody List<AnswerDTO> answers) {
         return answerService.saveAnswers(idQuestion, answers);
     }
 
-    @PutMapping("/updateAnswer")
     @ResponseStatus(CREATED)
-    public ResponseEntity<Answer> updateAnswer(@RequestBody Answer answer) {
-        try {
-            Answer newAnswer = answerService.updateAnswer(answer);
-            return new ResponseEntity<>(newAnswer, CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
-        }
+    @PutMapping("/updateAnswer")
+    public AnswerDTO updateAnswer(@RequestBody AnswerDTO answer) {
+        return answerService.updateAnswer(answer);
     }
 
     @ResponseStatus(NO_CONTENT)
@@ -63,23 +54,16 @@ public class AnswerController {
         answerService.deleteAnswer(idAnswer);
     }
 
-    @PostMapping("/saveUserAnswer")
-    public ResponseEntity<UserAnswer> saveUserAnswer(@RequestBody UserAnswerDTO userAnswerDTO) {
-        try {
-            UserAnswer newUserAnswer = userAnswerService.saveUserAnswer(userAnswerDTO);
-            return new ResponseEntity<>(newUserAnswer, CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
-        }
+    @ResponseStatus(CREATED)
+    @PostMapping("/saveUserAnswer/{idAnswer}/{idParticipant}")
+    public UserAnswerDTO saveUserAnswer(@PathVariable long idAnswer,
+                                                     @PathVariable long idParticipant,
+                                                     @RequestBody UserAnswerDTO userAnswerDTO) {
+            return userAnswerService.saveUserAnswer(idAnswer, idParticipant, userAnswerDTO);
     }
 
     @GetMapping("/getUserAnswers/{idQuestion}")
-    public ResponseEntity<List<UserAnswer>> getCorrectAnswers(@PathVariable("idQuestion") long idQuestion) {
-        try {
-            List<UserAnswer> userAnswers = userAnswerService.getUserAnswers(idQuestion);
-            return new ResponseEntity<>(userAnswers, OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
-        }
+    public List<UserAnswerDTO> getCorrectAnswers(@PathVariable long idQuestion) {
+        return userAnswerService.getUserAnswers(idQuestion);
     }
 }

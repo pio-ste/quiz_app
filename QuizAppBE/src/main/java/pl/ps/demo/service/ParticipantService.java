@@ -1,24 +1,23 @@
 package pl.ps.demo.service;
 
-import pl.ps.demo.service.dto.ParticipantDTO;
 import pl.ps.demo.model.enums.Status;
-import pl.ps.demo.model.entity.Participant;
+import pl.ps.demo.service.dto.ParticipantDTO;
 
 import java.util.List;
 
 public interface ParticipantService {
 
-    Participant saveParticipant(ParticipantDTO participantDTO);
+    ParticipantDTO saveParticipant(Long idUser, Long idQuiz, ParticipantDTO participantDTO);
 
     void deleteParticipant(Long id);
 
-    Participant getParticipant(Long id);
+    ParticipantDTO getParticipant(Long id);
 
-    List<Participant> getParticipantByStatus(Status status, Long idQuiz);
+    List<ParticipantDTO> getParticipantByStatus(Status status, Long idQuiz);
 
-    List<Participant> getParticipantGreaterThanResult(Integer result, Long idQuiz);
+    List<ParticipantDTO> getParticipantGreaterThanResult(Integer result, Long idQuiz);
 
-    List<Participant> getParticipantLessThanResult(Integer result, Long idQuiz);
+    List<ParticipantDTO> getParticipantLessThanResult(Integer result, Long idQuiz);
 
-    List<Participant> getAllParticipant(Long id);
+    List<ParticipantDTO> getAllParticipant(Long id);
 }

@@ -1,12 +1,14 @@
 package pl.ps.demo.service.impl;
 
 import org.springframework.stereotype.Service;
-import pl.ps.demo.model.entity.Quiz;
-import pl.ps.demo.model.entity.User;
 import pl.ps.demo.model.repository.QuizRepository;
 import pl.ps.demo.model.repository.UserRepository;
 import pl.ps.demo.service.QuizService;
+import pl.ps.demo.service.dto.QuizDTO;
+import pl.ps.demo.service.mapper.QuizMapper;
+import pl.ps.demo.service.validation.QuizValidation;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -21,35 +23,46 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public Quiz saveQuiz(Long idUser, Quiz quiz) {
-        User user = userRepository.findUserById(idUser);
+    public QuizDTO saveQuiz(Long idUser, QuizDTO quizDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var quizValidation = new QuizValidation(exceptionList, quizDTO);
+        quizValidation.validate();
+        var quiz = QuizMapper.mapFromDtoToEntity(quizDTO);
+        var user = userRepository.getByIdOrThrow(idUser);
         quiz.setUser(user);
-        return quizRepository.save(quiz);
+        return QuizMapper.mapFromEntityToDto(quizRepository.save(quiz));
     }
 
     @Override
-    public void deleteQuiz(Long id) {
-        quizRepository.deleteById(id);
+    public void deleteQuiz(Long idQuiz) {
+        quizRepository.deleteOrThrow(idQuiz);
     }
 
     @Override
-    public Quiz updateQuiz(Quiz quiz) {
-        Quiz newQuiz = quizRepository.findQuizById(quiz.getId());
-        newQuiz.setDescription(quiz.getDescription());
-        newQuiz.setEndDate(quiz.getEndDate());
-        newQuiz.setMaxPoints(quiz.getMaxPoints());
-        newQuiz.setStartDate(quiz.getStartDate());
-        newQuiz.setTitle(quiz.getTitle());
-        return quizRepository.save(newQuiz);
+    public QuizDTO updateQuiz(QuizDTO quizDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var quizValidation = new QuizValidation(exceptionList, quizDTO);
+        quizValidation.validate();
+        var quiz = quizRepository.findQuizById(quizDTO.getId());
+        quiz.setDescription(quizDTO.getDescription());
+        quiz.setEndDate(quizDTO.getEndDate());
+        quiz.setMaxPoints(quizDTO.getMaxPoints());
+        quiz.setStartDate(quizDTO.getStartDate());
+        quiz.setTitle(quizDTO.getTitle());
+        return QuizMapper.mapFromEntityToDto(quiz);
     }
 
     @Override
-    public Quiz getQuiz(Long id) {
-        return quizRepository.findQuizById(id);
+    public QuizDTO getQuiz(Long idQuiz) {
+        return QuizMapper.mapFromEntityToDto(quizRepository.getByIdOrThrow(idQuiz));
     }
 
     @Override
-    public List<Quiz> getAllUserQuizzes(Long id) {
-        return quizRepository.findQuizByUser_Id(id);
+    public List<QuizDTO> getAllUserQuizzes(Long idUser) {
+        List<QuizDTO> quizDTOS = new LinkedList<>();
+        userRepository.getByIdOrThrow(idUser);
+        quizRepository.findQuizByUser_Id(idUser).forEach(quiz ->
+                quizDTOS.add(QuizMapper.mapFromEntityToDto(quiz)));
+        return quizDTOS;
     }
 }

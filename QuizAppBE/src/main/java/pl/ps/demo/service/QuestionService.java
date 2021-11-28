@@ -2,20 +2,29 @@ package pl.ps.demo.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import pl.ps.demo.model.entity.Question;
+import pl.ps.demo.service.dto.QuestionDTO;
+import pl.ps.demo.service.dto.QuestionRelationDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface QuestionService {
 
-    Question saveQuestion(Long idQuiz, Question question, MultipartFile multipartFile);
+    QuestionRelationDTO saveQuestion(Long idQuiz, QuestionDTO questionDTO);
 
     void deleteQuestion(Long id);
 
-    Question updateQuestion(Question question);
+    QuestionRelationDTO updateQuestion(QuestionDTO questionDTO);
 
-    Question getQuestion(Long id);
+    QuestionRelationDTO getQuestion(Long id);
 
-    List<Question> getQuestionWithAnswersByIdQuiz(Long idQuiz);
+    List<QuestionRelationDTO> getQuestionWithAnswersByIdQuiz(Long idQuiz);
 
-    List<Question> getQuestionWithUserAnswersIdQuiz(Long idQuiz);
+    Map<String, Object> getQuestionWithAnswersByIdQuizPaging(Integer page, Long idQuiz);
+
+    List<QuestionRelationDTO> getQuestionWithUserAnswersIdQuiz(Long idQuiz);
+
+    List<QuestionRelationDTO> getQuestionByQuizUserId(Long idUser);
+
+    List<QuestionRelationDTO> getQuestionByQuizIdAndQuizUserId(Long idQuiz, Long idUser);
 }

@@ -1,7 +1,5 @@
 package pl.ps.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.Set;
 
@@ -9,7 +7,6 @@ import java.util.Set;
 @Table(name = "users")
 public class User extends IdField {
 
-    //TODO przykladowa encja ktora poprawilem
     private String userName;
 
     private String password;
@@ -21,20 +18,16 @@ public class User extends IdField {
     private String email;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<Quiz> quizzes;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<Participant> participants;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
-            joinColumns = {@JoinColumn(name = "id.users")},
-            inverseJoinColumns = {@JoinColumn(name = "id.roles")},
-            foreignKey = @ForeignKey(name = "fk_users"),
-            inverseForeignKey = @ForeignKey(name = "fk_roles"))
+            joinColumns = {@JoinColumn(name = "id_users")},
+            inverseJoinColumns = {@JoinColumn(name = "id_roles")})
     private Set<Role> roles;
 
     public User(Long id, String userName, String password, String firstName, String lastName, String email, Set<Quiz> quizzes, Set<Participant> participants, Set<Role> roles) {

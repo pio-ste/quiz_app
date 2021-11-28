@@ -1,13 +1,12 @@
 package pl.ps.demo.service;
 
 import pl.ps.demo.service.dto.UserAnswerDTO;
-import pl.ps.demo.model.entity.UserAnswer;
 
 import java.util.List;
 
 public interface UserAnswerService {
 
-    UserAnswer saveUserAnswer(UserAnswerDTO userAnswerDTO);
+    UserAnswerDTO saveUserAnswer(Long idAnswer, Long idParticipant, UserAnswerDTO userAnswerDTO);
 
-    List<UserAnswer> getUserAnswers(Long idQuestion);
+    List<UserAnswerDTO> getUserAnswers(Long idQuestion);
 }

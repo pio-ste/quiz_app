@@ -2,14 +2,19 @@ package pl.ps.demo.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.ps.demo.exception.MyCustomException;
 import pl.ps.demo.model.entity.Answer;
 import pl.ps.demo.model.entity.Question;
 import pl.ps.demo.model.repository.AnswerRepository;
 import pl.ps.demo.model.repository.QuestionRepository;
 import pl.ps.demo.service.AnswerService;
 import pl.ps.demo.service.QuestionService;
-import pl.ps.demo.service.validator.Validator;
+import pl.ps.demo.service.dto.AnswerDTO;
+import pl.ps.demo.service.mapper.AnswerMapper;
+import pl.ps.demo.service.validation.AnswerValidation;
+import pl.ps.demo.service.validation.QuizValidation;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -28,41 +33,49 @@ public class AnswerServiceImpl implements AnswerService {
 
 
     @Override
-    public List<Answer> saveAnswers(Long idQuestion, List<Answer> answers) {
-        Question question = questionRepository.findQuestionById(idQuestion);
+    public List<AnswerDTO> saveAnswers(Long idQuestion, List<AnswerDTO> answersDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var answerValidation = new AnswerValidation(exceptionList, answersDTO);
+        answerValidation.validate();
+        Question question = questionRepository.getByIdOrThrow(idQuestion);
+        List<Answer> answers = new LinkedList<>();
+        answersDTO.forEach(answerDTO -> answers.add(AnswerMapper.mapFromDtoToEntity(answerDTO)));
         answers.forEach(answer -> answer.setQuestion(question));
-        return answerRepository.saveAll(answers);
+        answerRepository.saveAll(answers);
+        answersDTO.clear();
+        answers.forEach(answer -> answersDTO.add(AnswerMapper.mapFromEntityToDto(answer)));
+        return answersDTO;
     }
 
     @Override
     public void deleteAnswer(Long id) {
-        answerRepository.deleteById(id);
+        if (id <= 0) throw new MyCustomException("Id can not be lower or equal 0!!");
+        answerRepository.deleteOrThrow(id);
     }
 
     @Override
-    public Answer updateAnswer(Answer answer) {
-        //TODO przykladowe zastosowanie getByIdOrThrow // mozna nazwac np. getOrThrow rowniez
-        Answer newAnswer = answerRepository.getByIdOrThrow(answer.getId());
-        newAnswer.setContent(answer.getContent());
-        newAnswer.setCorrect(answer.getCorrect());
-        return answerRepository.save(newAnswer);
+    public AnswerDTO updateAnswer(AnswerDTO answerDTO) {
+        var answer = answerRepository.getByIdOrThrow(answerDTO.getId());
+        answer.setContent(answerDTO.getContent());
+        answer.setCorrect(answerDTO.getCorrect());
+        return AnswerMapper.mapFromEntityToDto(answer);
     }
 
     @Override
-    public Answer getAnswer(Long id) {
-        return null;
+    public List<AnswerDTO> getAnswers(Long idQuestion, Boolean isCorrect) {
+        questionRepository.getByIdOrThrow(idQuestion);
+        List<AnswerDTO> answersDTO = new LinkedList<>();
+        answerRepository.findAnswerByQuestion_IdAndIsCorrect(idQuestion, isCorrect).forEach(answer ->
+                answersDTO.add(AnswerMapper.mapFromEntityToDto(answer)));
+        return answersDTO;
     }
 
     @Override
-    public List<Answer> getAnswers(Long id, Boolean isCorrect) {
-        return answerRepository.findAnswerByQuestion_IdAndIsCorrect(id, isCorrect);
-    }
-
-    @Override
-    public List<Answer> getAnswers(Long idQuestion) {
-        questionService.getQuestion(idQuestion);
-        var answerValidator = new Validator();
-        answerValidator.validate(idQuestion);
-        return answerRepository.findAnswerByIdQuestion(idQuestion);
+    public List<AnswerDTO> getAnswers(Long idQuestion) {
+        questionRepository.getByIdOrThrow(idQuestion);
+        List<AnswerDTO> answersDTO = new LinkedList<>();
+        answerRepository.findAnswerByQuestion_Id(idQuestion).forEach(answer ->
+                answersDTO.add(AnswerMapper.mapFromEntityToDto(answer)));
+        return answersDTO;
     }
 }

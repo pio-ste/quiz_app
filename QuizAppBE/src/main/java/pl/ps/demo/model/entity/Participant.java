@@ -1,37 +1,29 @@
 package pl.ps.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
 import pl.ps.demo.model.enums.Status;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
 @Table(name = "participant", schema = "quiz_app")
 public class Participant extends IdField {
 
-    @Column(name = "result", nullable = false, length = 3)
-    @NotNull
     private Integer result;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 15)
-    @NotNull
     private Status status;
 
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_user"))
-    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_quiz"))
-    @JsonIgnore
     private Quiz quiz;
 
     @OneToMany(mappedBy = "participant", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<UserAnswer> userAnswers;
 
     public Participant(Long id, Integer result, Status status, User user, Quiz quiz, Set<UserAnswer> userAnswers) {
