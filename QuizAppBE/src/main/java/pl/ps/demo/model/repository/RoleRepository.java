@@ -1,8 +1,7 @@
 package pl.ps.demo.model.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import pl.ps.demo.model.enums.RoleName;
 import pl.ps.demo.model.entity.Role;
+import pl.ps.demo.model.enums.RoleName;
 
 public interface RoleRepository extends AbstractJpaRepository<Role> {
 

@@ -1,4 +1,4 @@
-package pl.ps.demo.security;
+package pl.ps.demo.security.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthenticationFilter.setFilterProcessesUrl("/quizApp/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/quizApp/user/**", "/quizApp/login", "/quizApp/signUP", "/quizApp/home", "/quizApp/token/refresh/**").permitAll();
+        http.authorizeRequests().antMatchers("/quizApp/user/**", "/quizApp/signIN", "/quizApp/signUP", "/quizApp/home", "/quizApp/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers("/quizApp/student/**").hasAnyAuthority(RoleName.STUDENT.toString());
         http.authorizeRequests().antMatchers("/quizApp/tutor/**").hasAnyAuthority(RoleName.TUTOR.toString());
         http.authorizeRequests().anyRequest().permitAll();
@@ -54,4 +54,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 }

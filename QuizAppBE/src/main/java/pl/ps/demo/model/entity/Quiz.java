@@ -1,9 +1,9 @@
 package pl.ps.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -11,38 +11,31 @@ import java.util.Set;
 @Table(name = "quiz", schema = "quiz_app")
 public class Quiz extends IdField {
 
-    @Column(name = "title", nullable = false, length = 200)
-    @NotNull
     private String title;
 
-    @Column(name = "description", nullable = false, length = 500)
-    @NotNull
     private String description;
 
-    @Column(name = "max_points", nullable = false, length = 5)
-    @NotNull
     private Integer maxPoints;
 
-    @Column(name = "start_date", nullable = false, columnDefinition = "TIMESTAMP")
-    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDate;
 
-    @Column(name = "end_date", nullable = false, columnDefinition = "TIMESTAMP")
-    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime endDate;
 
     @ManyToOne
-    @JoinColumn(name = "users_id", nullable = false, foreignKey = @ForeignKey(name = "fk_users"))
-    @JsonIgnore
+    @JoinColumn(name = "users_id", foreignKey = @ForeignKey(name = "fk_users"))
     private User user;
 
-    @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Question> questions;
 
-    @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
+
+    public void addQuestion(Question question){
+        questions.add(question);
+    }
 
     public Quiz(Long id, String title, String description, Integer maxPoints, LocalDateTime startDate, LocalDateTime endDate, User user, Set<Question> questions, Set<Participant> participants) {
         super(id);
@@ -69,6 +62,9 @@ public class Quiz extends IdField {
         this.user = quizBuilder.user;
         this.questions = quizBuilder.questions;
         this.participants = quizBuilder.participants;
+        /*if (this.endDate.isBefore(startDate)) {
+            throw new MyCustomException("Data zakonczenia nie moze być wczesniejsza od daty rozpoczecia");
+        }*/
     }
 
     public String getTitle() {

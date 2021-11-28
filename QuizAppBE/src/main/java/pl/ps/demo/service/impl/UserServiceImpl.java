@@ -1,17 +1,25 @@
 package pl.ps.demo.service.impl;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.ps.demo.exception.ValidationException;
 import pl.ps.demo.model.entity.Role;
 import pl.ps.demo.model.entity.User;
 import pl.ps.demo.model.enums.RoleName;
 import pl.ps.demo.model.repository.RoleRepository;
 import pl.ps.demo.model.repository.UserRepository;
+import pl.ps.demo.security.service.UserDetailsImpl;
 import pl.ps.demo.service.UserService;
+import pl.ps.demo.service.dto.UserDTO;
+import pl.ps.demo.service.mapper.UserMapper;
+import pl.ps.demo.service.validation.UserValidation;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -26,6 +34,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
+
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -33,23 +42,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User saveStudent(User user) {
+    public UserDTO saveStudent(UserDTO userDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var userValidation = new UserValidation(exceptionList, userDTO);
+        userValidation.validate();
+        var user = UserMapper.mapFromDtoToEntity(userDTO);
         Role role = roleRepository.findByRoleName(RoleName.STUDENT);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);
-        return userRepository.save(user);
+        return UserMapper.mapFromEntityToDto(userRepository.save(user));
     }
 
     @Override
-    public User saveTutor(User user) {
+    public UserDTO saveTutor(UserDTO userDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var userValidation = new UserValidation(exceptionList, userDTO);
+        userValidation.validate();
+        var user = UserMapper.mapFromDtoToEntity(userDTO);
         Role role = roleRepository.findByRoleName(RoleName.TUTOR);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);
-        return userRepository.save(user);
+        return UserMapper.mapFromEntityToDto(userRepository.save(user));
     }
 
     @Override
@@ -58,13 +75,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUser(User user) {
-        User newUser = userRepository.findUserById(user.getId());
-        newUser.setEmail(user.getEmail());
-        newUser.setFirstName(user.getFirstName());
-        newUser.setLastName(user.getLastName());
-        newUser.setUserName(user.getUserName());
-        return userRepository.save(newUser);
+    public UserDTO updateUser(UserDTO userDTO) {
+        List<String> exceptionList = new LinkedList<>();
+        var userValidation = new UserValidation(exceptionList, userDTO);
+        userValidation.validate();
+        User user = userRepository.getByIdOrThrow(userDTO.getId());
+        user.setEmail(userDTO.getEmail());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setUserName(userDTO.getUserName());
+        return UserMapper.mapFromEntityToDto(user);
     }
 
     @Override
@@ -80,21 +100,37 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<User> getStudents() {
+    public List<UserDTO> getStudents() {
+        List<UserDTO> userDTOS = new LinkedList<>();
         Role role = roleRepository.findByRoleName(RoleName.STUDENT);
-        return userRepository.findUserByRolesEquals(role);
+        userRepository.findUserByRolesEquals(role).forEach(user ->
+                userDTOS.add(UserMapper.mapFromEntityToDto(user)));
+        return userDTOS;
     }
 
+    /*@Override
+    public Authentication signIN(String userName, String password) {
+        if (userName.isEmpty() || password.isEmpty()){
+            List<String> exceptionList = new LinkedList<>();
+            exceptionList.add("Wpisz");
+            throw new ValidationException(exceptionList);
+        } else {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
+            return authenticationManager.authenticate(authenticationToken);
+        }
+    }*/
+
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userName) {
         User user = userRepository.findByUserNameOrThrow(userName);
-        if (user == null) {
+        if (user != null){
+            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            user.getRoles().forEach(role -> {
+                authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+            });
+            return new UserDetailsImpl(user.getId(), user.getUserName(), user.getEmail(), user.getPassword(), authorities);
+        } else {
             throw new UsernameNotFoundException("Nie znaleziono użytkownika");
         }
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
-        });
-        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), authorities);
     }
 }

@@ -1,31 +1,23 @@
 package pl.ps.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
-
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_answer", schema = "quiz_app")
 public class UserAnswer extends IdField {
 
-    @Column(name = "is_correct", nullable = false, columnDefinition = "boolean default false")
-    @NotNull
     private Boolean isCorrect;
 
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false, foreignKey = @ForeignKey(name = "fk_question"))
-    @JsonIgnore
     private Question question;
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_answer"))
-    @JsonIgnore
     private Answer answer;
 
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false, foreignKey = @ForeignKey(name = "fk_participant"))
-    @JsonIgnore
     private Participant participant;
 
     public UserAnswer(Long id, Boolean isCorrect, Question question, Answer answer, Participant participant) {

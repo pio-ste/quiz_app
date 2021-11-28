@@ -1,6 +1,5 @@
 package pl.ps.demo.model.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import pl.ps.demo.model.entity.Quiz;
 
 import java.util.List;

@@ -3,19 +3,26 @@ package pl.ps.demo.service.dto;
 import pl.ps.demo.model.enums.Status;
 
 public class ParticipantDTO {
+
+    private Long id;
     private Integer result;
     private Status status;
-    private Long quizID;
-    private Long userID;
 
     public ParticipantDTO() {
     }
 
-    public ParticipantDTO(Integer result, Status status, Long quizID, Long userID) {
+    public ParticipantDTO(Long id, Integer result, Status status) {
+        this.id = id;
         this.result = result;
         this.status = status;
-        this.quizID = quizID;
-        this.userID = userID;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getResult() {
@@ -34,19 +41,38 @@ public class ParticipantDTO {
         this.status = status;
     }
 
-    public Long getQuizID() {
-        return quizID;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setQuizID(Long quizID) {
-        this.quizID = quizID;
-    }
+    public static final class Builder {
+        private Long id;
+        private Integer result;
+        private Status status;
 
-    public Long getUserID() {
-        return userID;
-    }
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
 
-    public void setUserID(Long userID) {
-        this.userID = userID;
+        public Builder result(Integer result) {
+            this.result = result;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public ParticipantDTO build() {
+            ParticipantDTO participantDTO = new ParticipantDTO();
+
+            participantDTO.id = this.id;
+            participantDTO.result = this.result;
+            participantDTO.status = this.status;
+
+            return participantDTO;
+        }
     }
 }

@@ -1,11 +1,10 @@
 package pl.ps.demo.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.ps.demo.model.entity.Quiz;
 import pl.ps.demo.service.QuizService;
+import pl.ps.demo.service.dto.QuizDTO;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,53 +18,29 @@ public class QuizController {
     }
 
     @GetMapping("/getUserQuiz/{idUser}")
-    public ResponseEntity<List<Quiz>> getUserQuiz(@PathVariable("idUser") long idUser) {
-        try {
-            List<Quiz> quizzes = quizService.getAllUserQuizzes(idUser);
-            return new ResponseEntity<>(quizzes, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public List<QuizDTO> getUserQuiz(@PathVariable long idUser) {
+        return quizService.getAllUserQuizzes(idUser);
     }
 
     @GetMapping("/getQuiz/{idQuiz}")
-    public ResponseEntity<Quiz> getQuiz(@PathVariable("idQuiz") long idQuiz) {
-        try {
-            Quiz quiz = quizService.getQuiz(idQuiz);
-            return new ResponseEntity<>(quiz, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public QuizDTO getQuiz(@PathVariable long idQuiz) {
+        return quizService.getQuiz(idQuiz);
     }
 
     @PostMapping("/saveQuiz/{idUser}")
-    public ResponseEntity<Quiz> saveQuiz(@PathVariable("idUser") long idUser,
-                                         @RequestBody Quiz quiz) {
-        try {
-            Quiz newQuiz = quizService.saveQuiz(idUser, quiz);
-            return new ResponseEntity<>(newQuiz, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public QuizDTO saveQuiz(@PathVariable long idUser,
+                            @Valid @RequestBody QuizDTO quizDTO) {
+        return quizService.saveQuiz(idUser, quizDTO);
     }
 
     @PutMapping("/updateQuiz")
-    public ResponseEntity<Quiz> updateQuiz(@RequestBody Quiz Quiz) {
-        try {
-            Quiz newQuiz = quizService.updateQuiz(Quiz);
-            return new ResponseEntity<>(newQuiz, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public QuizDTO updateQuiz(@RequestBody QuizDTO quizDTO) {
+
+        return quizService.updateQuiz(quizDTO);
     }
 
     @DeleteMapping("/deleteQuiz/{idQuiz}")
-    public ResponseEntity<HttpStatus> deleteQuiz(@PathVariable("idQuiz") long idQuiz) {
-        try {
-            quizService.deleteQuiz(idQuiz);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public void deleteQuiz(@PathVariable long idQuiz) {
+        quizService.deleteQuiz(idQuiz);
     }
 }

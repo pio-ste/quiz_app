@@ -2,19 +2,25 @@ package pl.ps.demo.service.dto;
 
 public class UserAnswerDTO {
 
+    private Long id;
     private Boolean isCorrect;
-    private Long questionID;
-    private Long answerID;
-    private Long participantID;
+    private Long idQuestion;
 
     public UserAnswerDTO() {
     }
 
-    public UserAnswerDTO(Boolean isCorrect, Long questionID, Long answerID, Long participantID) {
+    public UserAnswerDTO(Long id, Boolean isCorrect, Long idQuestion) {
+        this.id = id;
         this.isCorrect = isCorrect;
-        this.questionID = questionID;
-        this.answerID = answerID;
-        this.participantID = participantID;
+        this.idQuestion = idQuestion;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Boolean getCorrect() {
@@ -25,27 +31,45 @@ public class UserAnswerDTO {
         isCorrect = correct;
     }
 
-    public Long getQuestionID() {
-        return questionID;
+    public Long getIdQuestion() {
+        return idQuestion;
     }
 
-    public void setQuestionID(Long questionID) {
-        this.questionID = questionID;
+    public void setIdQuestion(Long idQuestion) {
+        this.idQuestion = idQuestion;
     }
 
-    public Long getAnswerID() {
-        return answerID;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public void setAnswerID(Long answerID) {
-        this.answerID = answerID;
-    }
+    public static final class Builder {
+        private Long id;
+        private Boolean isCorrect;
+        private Long idQuestion;
 
-    public Long getParticipantID() {
-        return participantID;
-    }
+        public Builder id(Long id){
+            this.id = id;
+            return this;
+        }
 
-    public void setParticipantID(Long participantID) {
-        this.participantID = participantID;
+        public Builder isCorrect(Boolean isCorrect){
+            this.isCorrect = isCorrect;
+            return this;
+        }
+
+        public Builder idQuestion(Long idQuestion){
+            this.idQuestion = idQuestion;
+            return this;
+        }
+
+        public UserAnswerDTO build(){
+            UserAnswerDTO userAnswerDTO = new UserAnswerDTO();
+            userAnswerDTO.id = this.id;
+            userAnswerDTO.isCorrect = this.isCorrect;
+            userAnswerDTO.idQuestion = this.idQuestion;
+            return userAnswerDTO;
+        }
+
     }
 }

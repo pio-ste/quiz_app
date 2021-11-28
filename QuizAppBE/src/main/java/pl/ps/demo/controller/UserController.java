@@ -5,11 +5,9 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.ps.demo.service.dto.UserDTO;
 import pl.ps.demo.model.entity.Role;
 import pl.ps.demo.model.entity.User;
@@ -18,7 +16,6 @@ import pl.ps.demo.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,13 +25,16 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
-@RequestMapping("/quizApp/user")
+@RequestMapping("/quizApp")
 public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /*@GetMapping("/tutor/getUsers")
@@ -43,28 +43,14 @@ public class UserController {
     }*/
 
     @PostMapping("/saveStudent")
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        //TODO wyrzuc ta linijke
-        userService.getUser(";[;fw");
-        try {
-            User newUser = userService.saveStudent(user);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public UserDTO saveUser(@RequestBody UserDTO userDTO) {
+        return userService.saveStudent(userDTO);
 
     }
 
-    @PostMapping("/saveRole")
-    public ResponseEntity<Role> saveUser(@RequestBody Role role) {
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/saveRole").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveRole(role));
-    }
-
-    @PostMapping("/addRoleToUser")
-    public ResponseEntity<?> addRoleToUser(@RequestBody UserDTO userDTO) {
-        userService.addRoleToUser(userDTO.getUserName(), userDTO.getRoleName());
-        return ResponseEntity.ok().build();
+    @PostMapping("/password/{password}")
+    public void editPassword(@PathVariable String password){
+        System.out.println(passwordEncoder.encode(password));
     }
 
     @GetMapping("/token/refresh")

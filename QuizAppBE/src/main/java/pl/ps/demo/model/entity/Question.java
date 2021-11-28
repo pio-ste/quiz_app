@@ -1,42 +1,31 @@
 package pl.ps.demo.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
-
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Entity
 @Table(name = "question", schema = "quiz_app")
 public class Question extends IdField {
 
-    @Column(name = "content", nullable = false, length = 300)
-    @NotNull
     private String content;
 
-    @Column(name = "img")
     @Lob
     private Byte[] img;
 
-    @Column(name = "time", nullable = false, length = 3)
-    @NotNull
     private Integer time;
 
-    @Column(name = "points", nullable = false, length = 2)
-    @NotNull
     private Integer points;
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false, foreignKey = @ForeignKey(name = "fk_quiz"))
-    @JsonIgnore
     private Quiz quiz;
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<UserAnswer> userAnswers;
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<Answer> answers;
 
     public Question(Long id, String content, Byte[] img, Integer time, Integer points, Quiz quiz, Set<UserAnswer> userAnswers, Set<Answer> answers) {
