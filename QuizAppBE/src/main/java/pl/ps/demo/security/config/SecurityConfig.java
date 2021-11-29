@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import pl.ps.demo.model.enums.RoleName;
 import pl.ps.demo.security.filter.CustomAuthenticationFilter;
 import pl.ps.demo.security.filter.CustomAuthorizationFilter;
+import pl.ps.demo.security.handler.RestAccessDeniedHandler;
+import pl.ps.demo.security.handler.RestAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -40,10 +42,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         customAuthenticationFilter.setFilterProcessesUrl("/quizApp/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/quizApp/user/**", "/quizApp/signIN", "/quizApp/signUP", "/quizApp/home", "/quizApp/token/refresh/**").permitAll();
+        http.authorizeRequests().
+                antMatchers("/quizApp/user/**", "/quizApp/login", "/quizApp/signUP", "/quizApp/home", "/quizApp/token/refresh/**").permitAll();
         http.authorizeRequests().antMatchers("/quizApp/student/**").hasAnyAuthority(RoleName.STUDENT.toString());
         http.authorizeRequests().antMatchers("/quizApp/tutor/**").hasAnyAuthority(RoleName.TUTOR.toString());
-        http.authorizeRequests().anyRequest().permitAll();
+        http.authorizeRequests().antMatchers("/quizApp/login").permitAll()
+                .anyRequest().authenticated()
+                .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint());
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
@@ -54,5 +60,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
+    @Bean
+    public RestAccessDeniedHandler accessDeniedHandler() {
+        return new RestAccessDeniedHandler();
+    }
+
+    @Bean
+    public RestAuthenticationEntryPoint authenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
+
+
 
 }

@@ -62,7 +62,6 @@ public class QuestionServiceImpl implements QuestionService {
                 e.printStackTrace();
             }
         }*/
-        //quiz.addQuestion(question);
         question.setQuiz(quiz);
         return QuestionMapper.mapFromEntityToDtoRelation(questionRepository.save(question));
     }

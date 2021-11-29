@@ -52,18 +52,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public List<String> handleConstraintViolationException(ConstraintViolationException e) {
         return e.getConstraintViolations().stream().map(ConstraintViolation::getMessageTemplate).collect(Collectors.toList());
     }
-
-    @ResponseStatus(UNAUTHORIZED)
-    @ResponseBody
-    @ExceptionHandler(AuthException.class)
-    public String handleConstraintViolationException(AuthException e) {
-
-        return e.getMessage();
-    }
-
-    @ResponseStatus(UNAUTHORIZED)
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public String handleConflict(final UsernameNotFoundException e) {
-        return e.getMessage();
-    }
 }

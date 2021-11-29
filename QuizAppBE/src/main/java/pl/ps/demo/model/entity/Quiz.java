@@ -33,10 +33,6 @@ public class Quiz extends IdField {
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Participant> participants;
 
-    public void addQuestion(Question question){
-        questions.add(question);
-    }
-
     public Quiz(Long id, String title, String description, Integer maxPoints, LocalDateTime startDate, LocalDateTime endDate, User user, Set<Question> questions, Set<Participant> participants) {
         super(id);
         this.title = title;
@@ -62,9 +58,6 @@ public class Quiz extends IdField {
         this.user = quizBuilder.user;
         this.questions = quizBuilder.questions;
         this.participants = quizBuilder.participants;
-        /*if (this.endDate.isBefore(startDate)) {
-            throw new MyCustomException("Data zakonczenia nie moze być wczesniejsza od daty rozpoczecia");
-        }*/
     }
 
     public String getTitle() {
