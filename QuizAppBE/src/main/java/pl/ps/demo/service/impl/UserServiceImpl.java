@@ -1,15 +1,18 @@
 package pl.ps.demo.service.impl;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.ps.demo.exception.ValidationException;
+import pl.ps.demo.exception.MyCustomException;
 import pl.ps.demo.model.entity.Role;
 import pl.ps.demo.model.entity.User;
 import pl.ps.demo.model.enums.RoleName;
@@ -21,8 +24,15 @@ import pl.ps.demo.service.dto.UserDTO;
 import pl.ps.demo.service.mapper.UserMapper;
 import pl.ps.demo.service.validation.UserValidation;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Service
 @Transactional
@@ -44,7 +54,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO saveStudent(UserDTO userDTO) {
         List<String> exceptionList = new LinkedList<>();
-        var userValidation = new UserValidation(exceptionList, userDTO);
+        var userValidation = new UserValidation(exceptionList, userDTO, userRepository);
         userValidation.validate();
         var user = UserMapper.mapFromDtoToEntity(userDTO);
         Role role = roleRepository.findByRoleName(RoleName.STUDENT);
@@ -58,7 +68,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO saveTutor(UserDTO userDTO) {
         List<String> exceptionList = new LinkedList<>();
-        var userValidation = new UserValidation(exceptionList, userDTO);
+        var userValidation = new UserValidation(exceptionList, userDTO, userRepository);
         userValidation.validate();
         var user = UserMapper.mapFromDtoToEntity(userDTO);
         Role role = roleRepository.findByRoleName(RoleName.TUTOR);
@@ -77,7 +87,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO updateUser(UserDTO userDTO) {
         List<String> exceptionList = new LinkedList<>();
-        var userValidation = new UserValidation(exceptionList, userDTO);
+        var userValidation = new UserValidation(exceptionList, userDTO, userRepository);
         userValidation.validate();
         User user = userRepository.getByIdOrThrow(userDTO.getId());
         user.setEmail(userDTO.getEmail());
@@ -108,17 +118,40 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userDTOS;
     }
 
-    /*@Override
-    public Authentication signIN(String userName, String password) {
-        if (userName.isEmpty() || password.isEmpty()){
-            List<String> exceptionList = new LinkedList<>();
-            exceptionList.add("Wpisz");
-            throw new ValidationException(exceptionList);
+    @Override
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                String refresh_token = authorizationHeader.substring("Bearer ".length());
+                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                String userName = decodedJWT.getSubject();
+                User user = userRepository.findByUserNameOrThrow(userName);
+                String access_token = JWT.create()
+                        .withSubject(user.getUserName())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                        .withIssuer(request.getRequestURL().toString())
+                        .withClaim("roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList()))
+                        .sign(algorithm);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", access_token);
+                tokens.put("refresh_token", refresh_token);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            } catch (Exception exception) {
+                response.setHeader("error ", exception.getMessage());
+                response.setStatus(FORBIDDEN.value());
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("error_message", exception.getMessage());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            }
         } else {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
-            return authenticationManager.authenticate(authenticationToken);
+            throw new MyCustomException("Refresh token is missing");
         }
-    }*/
+    }
 
     @Override
     public UserDetails loadUserByUsername(String userName) {
