@@ -7,6 +7,9 @@ import pl.ps.demo.model.enums.RoleName;
 import pl.ps.demo.model.entity.Role;
 import pl.ps.demo.service.dto.UserDTO;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
@@ -24,4 +27,6 @@ public interface UserService {
     User getUser(String userName);
 
     List<UserDTO> getStudents();
+
+    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
 }

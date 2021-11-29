@@ -1,6 +1,7 @@
 package pl.ps.demo.service.validation;
 
 import pl.ps.demo.exception.ValidationException;
+import pl.ps.demo.model.repository.UserRepository;
 import pl.ps.demo.service.dto.UserDTO;
 
 import java.util.List;
@@ -11,13 +12,24 @@ public class UserValidation {
 
     private List<String> exceptionList;
     private final UserDTO userDTO;
+    private final UserRepository userRepository;
 
-    public UserValidation(List<String> exceptionList, UserDTO userDTO) {
+    public UserValidation(List<String> exceptionList, UserDTO userDTO, UserRepository userRepository) {
         this.exceptionList = exceptionList;
         this.userDTO = userDTO;
+        this.userRepository = userRepository;
     }
 
     public void validate(){
+
+        if (userRepository.existsByEmail(userDTO.getEmail())){
+            exceptionList.add("Użytkownik o podanym Email'u " + userDTO.getEmail() + " istnieje!");
+        }
+
+        if (userRepository.existsByUserName(userDTO.getUserName())){
+            exceptionList.add("Użytkownik o podanej nazwie użytkownika " + userDTO.getUserName() + " istnieje!");
+        }
+
         if (isNull(userDTO.getUserName()) || isEmpty(userDTO.getUserName())){
             exceptionList.add("Wpisz nazwę użytkownika!");
         } else if (minLength(userDTO.getUserName(), 4)){
